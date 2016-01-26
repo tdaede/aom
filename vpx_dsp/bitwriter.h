@@ -15,7 +15,7 @@
 
 #include "vpx_dsp/prob.h"
 
-#include "./entenc.h"
+#include "entenc.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -45,7 +45,11 @@ static INLINE void vpx_write(vpx_writer *br, int bit, int probability) {
   register int shift;
 
 #if DAALA_ENTROPY_CODER
-  od_ec_encode_bool_q15(&br->ec, bit, probability * 128);
+  if (probability == 128) {
+    od_ec_enc_bits(&br->ec, bit, 1);
+  } else {
+    od_ec_encode_bool_q15(&br->ec, bit, probability * 128);
+  }
 #endif
 
   split = 1 + (((range - 1) * probability) >> 8);
