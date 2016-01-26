@@ -19,6 +19,7 @@
 #include "vpx/vp8dx.h"
 #include "vpx/vpx_integer.h"
 #include "vpx_dsp/prob.h"
+#include "entdec.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -43,6 +44,9 @@ typedef struct {
   vpx_decrypt_cb decrypt_cb;
   void *decrypt_state;
   uint8_t clear_buffer[sizeof(BD_VALUE) + 1];
+#ifdef DAALA_ENTROPY_CODER
+  od_ec_dec ec;
+#endif
 } vpx_reader;
 
 int vpx_reader_init(vpx_reader *r, const uint8_t *buffer, size_t size,
@@ -70,6 +74,15 @@ static INLINE int vpx_reader_has_error(vpx_reader *r) {
   return r->count > BD_VALUE_SIZE && r->count < LOTS_OF_BITS;
 }
 
+#if DAALA_ENTROPY_CODER
+static INLINE int vpx_read(vpx_reader *r, int prob) {
+  if (prob == 128) {
+    return od_ec_dec_bits(&r->ec, 1, "vpx_bits");
+  } else {
+    return od_ec_decode_bool_q15(&r->ec, prob * 128, "vpx");
+  }
+}
+#else
 static INLINE int vpx_read(vpx_reader *r, int prob) {
   unsigned int bit = 0;
   BD_VALUE value;
@@ -105,6 +118,7 @@ static INLINE int vpx_read(vpx_reader *r, int prob) {
 
   return bit;
 }
+#endif
 
 static INLINE int vpx_read_bit(vpx_reader *r) {
   return vpx_read(r, 128);  // vpx_prob_half

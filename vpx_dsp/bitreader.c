@@ -30,11 +30,17 @@ int vpx_reader_init(vpx_reader *r, const uint8_t *buffer, size_t size,
     r->range = 255;
     r->decrypt_cb = decrypt_cb;
     r->decrypt_state = decrypt_state;
+#if DAALA_ENTROPY_CODER
+    od_ec_dec_init(&r->ec, buffer, size);
+    return 0;
+#else
     vpx_reader_fill(r);
     return vpx_read_bit(r) != 0;  // marker bit
+#endif
   }
 }
 
+#if !DAALA_ENTROPY_CODER
 void vpx_reader_fill(vpx_reader *r) {
   const uint8_t *const buffer_end = r->buffer_end;
   const uint8_t *buffer = r->buffer;
@@ -89,7 +95,13 @@ void vpx_reader_fill(vpx_reader *r) {
   r->value = value;
   r->count = count;
 }
+#endif
 
+#if DAALA_ENTROPY_CODER
+const uint8_t *vpx_reader_find_end(vpx_reader *r) {
+  return r->buffer_end;
+}
+#else
 const uint8_t *vpx_reader_find_end(vpx_reader *r) {
   // Find the end of the coded buffer
   while (r->count > CHAR_BIT && r->count < BD_VALUE_SIZE) {
@@ -98,3 +110,4 @@ const uint8_t *vpx_reader_find_end(vpx_reader *r) {
   }
   return r->buffer;
 }
+#endif

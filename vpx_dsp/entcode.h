@@ -28,6 +28,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.*/
 # include <stddef.h>
 # include <stdint.h>
 
+#define DAALA_ENTROPY_CODER (1)
+
 /*Enable special features for gcc and compatible compilers.*/
 # if defined(__GNUC__) && defined(__GNUC_MINOR__) && defined(__GNUC_PATCHLEVEL__)
 #  define OD_GNUC_PREREQ(maj, min, pat)                             \
