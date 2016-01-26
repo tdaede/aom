@@ -15,9 +15,13 @@
 
 #include "vpx_dsp/prob.h"
 
+#include "./entenc.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+#define DAALA_ENTROPY_CODER (1)
 
 typedef struct vpx_writer {
   unsigned int lowvalue;
@@ -25,6 +29,9 @@ typedef struct vpx_writer {
   int count;
   unsigned int pos;
   uint8_t *buffer;
+#if DAALA_ENTROPY_CODER
+  od_ec_enc ec;
+#endif
 } vpx_writer;
 
 void vpx_start_encode(vpx_writer *bc, uint8_t *buffer);
@@ -36,6 +43,10 @@ static INLINE void vpx_write(vpx_writer *br, int bit, int probability) {
   unsigned int range = br->range;
   unsigned int lowvalue = br->lowvalue;
   register int shift;
+
+#if DAALA_ENTROPY_CODER
+  od_ec_encode_bool_q15(&br->ec, bit, probability * 128);
+#endif
 
   split = 1 + (((range - 1) * probability) >> 8);
 

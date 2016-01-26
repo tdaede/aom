@@ -11,8 +11,11 @@
 #include <assert.h>
 
 #include "./bitwriter.h"
+#include "entenc.h"
+#include <stdio.h>
 
 void vpx_start_encode(vpx_writer *br, uint8_t *source) {
+  od_ec_enc_init(&br->ec, 1000000);
   br->lowvalue = 0;
   br->range = 255;
   br->count = -24;
@@ -23,8 +26,13 @@ void vpx_start_encode(vpx_writer *br, uint8_t *source) {
 
 void vpx_stop_encode(vpx_writer *br) {
   int i;
-
-  for (i = 0; i < 32; i++) vpx_write_bit(br, 0);
+  uint32_t daala_bytes;
+  od_ec_enc_done(&br->ec, &daala_bytes);
+  fprintf(stderr, "vpx coder: %d daala coder: %d\n", br->pos, daala_bytes);
+  for (i = 0; i < 32; i++)
+    vpx_write_bit(br, 0);
+  // Leaks memory but somewhere vpx_write_bit is being called after stop_encode
+  od_ec_enc_reset(&br->ec);
 
   // Ensure there's no ambigous collision with any index marker bytes
   if ((br->buffer[br->pos - 1] & 0xe0) == 0xc0) br->buffer[br->pos++] = 0;
