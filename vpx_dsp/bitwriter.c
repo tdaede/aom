@@ -36,11 +36,14 @@ void vpx_stop_encode(vpx_writer *br) {
   memcpy(br->buffer, daala_data, daala_bytes);
   br->pos = daala_bytes;
   od_ec_enc_clear(&br->ec);
+  // Ensure there's no ambigous collision with any index marker bytes
+  // this always wastes a byte which is not great
+  br->buffer[br->pos++] = 0;
 #else
   int i;
   for (i = 0; i < 32; i++)
     vpx_write_bit(br, 0);
-#endif
   // Ensure there's no ambigous collision with any index marker bytes
   if ((br->buffer[br->pos - 1] & 0xe0) == 0xc0) br->buffer[br->pos++] = 0;
+#endif
 }
