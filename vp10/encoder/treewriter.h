@@ -31,11 +31,47 @@ void vp10_tokens_from_tree(struct vp10_token *, const vpx_tree_index *);
 static INLINE void vp10_write_tree(vpx_writer *w, const vpx_tree_index *tree,
                                    const vpx_prob *probs, int bits, int len,
                                    vpx_tree_index i) {
+#if DAALA_ENTROPY_CODER
+  if (len > 4) {
+    /* this should be handled by multiple cdfs, lazy for now */
+    do {
+      const int bit = (bits >> --len) & 1;
+      vpx_write(w, bit, probs[i >> 1]);
+      i = tree[i + bit];
+    } while (len);
+  } else {
+    int symbol;
+    uint16_t cdf[16];
+    printf("CDF: ");
+    for (symbol = 0; symbol < 1<<len; symbol++) {
+      uint32_t prob = 1;
+      int itmp = i;
+      int lentmp = len;
+      do {
+        const int bit = (symbol >> --lentmp) & 1;
+        prob *= bit ? probs[itmp >> 1] : 255 - probs[itmp >> 1];
+        itmp = tree[itmp + bit];
+      } while (lentmp);
+      /* scale prob into 0-255 range, probably busted */
+      prob >>= 8*(len-1);
+      if (symbol == 0) {
+        cdf[0] = prob;
+      } else {
+        cdf[symbol] = cdf[symbol-1] + prob;
+      }
+      printf("%d ",cdf[symbol]);
+    }
+    printf("\n");
+    od_ec_encode_cdf_unscaled(&w->ec, bits & ((1<<len)-1),
+     cdf, 1<<len);
+  }
+#else
   do {
     const int bit = (bits >> --len) & 1;
     vpx_write(w, bit, probs[i >> 1]);
     i = tree[i + bit];
   } while (len);
+#endif
 }
 
 static INLINE void vp10_write_token(vpx_writer *w, const vpx_tree_index *tree,
