@@ -163,7 +163,7 @@ void vp10_dering_frame(YV12_BUFFER_CONFIG *frame, VP10_COMMON *cm,
     for (c = 0; c < cm->mi_cols; ++c) {
       const MB_MODE_INFO *mbmi =
           &cm->mi_grid_visible[r * cm->mi_stride + c]->mbmi;
-      bskip[r * cm->mi_cols + c] = mbmi->skip;
+      bskip[r * cm->mi_cols + c] = mbmi->skip || is_inter_block(mbmi);
     }
   }
   for (sbr = 0; sbr < nvsb; sbr++) {
