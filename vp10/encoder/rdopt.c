@@ -989,7 +989,7 @@ static int64_t rd_pick_intra4x4block(VP10_COMP *cpi, MACROBLOCK *x, int row,
           // TODO: Properly use skip info (for 4x4 block here) from pvq
           skip = pvq_encode_helper2(coeff, ref_coeff, dqcoeff,
               &p->eobs[block], pd->dequant[0],
-              0, TX_4X4, &rate_pvq, pvq_info);
+              0, TX_4X4, &rate_pvq, pvq_info, &x->daala_enc);
           ratey += rate_pvq;
 #endif
           if (RDCOST(x->rdmult, x->rddiv, ratey, distortion) >= best_rd)
@@ -1010,7 +1010,7 @@ static int64_t rd_pick_intra4x4block(VP10_COMP *cpi, MACROBLOCK *x, int row,
           // TODO: Properly use skip info (for 4x4 block here) from pvq
           skip = pvq_encode_helper2(coeff, ref_coeff, dqcoeff,
               &p->eobs[block], pd->dequant[0],
-              0, TX_4X4, &rate_pvq, pvq_info);
+              0, TX_4X4, &rate_pvq, pvq_info, &x->daala_enc);
           ratey += rate_pvq;
 #endif
           distortion +=

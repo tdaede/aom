@@ -13,6 +13,9 @@
 
 #include "vp10/common/entropymv.h"
 #include "vp10/common/entropy.h"
+#if CONFIG_PVQ
+#include "vp10/encoder/encint.h"
+#endif
 
 #ifdef __cplusplus
 extern "C" {
@@ -145,6 +148,7 @@ struct macroblock {
 #if CONFIG_PVQ
   int rate;
   int64_t dist;
+  daala_enc_ctx daala_enc;
 #endif
 };
 

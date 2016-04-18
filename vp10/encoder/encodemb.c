@@ -29,8 +29,6 @@
 #if CONFIG_PVQ
 #include "vp10/encoder/encint.h"
 #include "vp10/encoder/pvq_encoder.h"
-
-extern daala_enc_ctx daala_enc;
 #endif
 
 struct optimize_ctx {
@@ -718,7 +716,8 @@ void vp10_xform_quant_fp(MACROBLOCK *x, int plane, int block, int blk_row,
                             0,              // keyframe (daala's definition)? 0 for now
                             tx_size,        // block size in log_2 - 2, 0 for 4x4.
                             &x->rate,       // rate measured
-                            pvq_info); // PVQ info for a block
+                            pvq_info, // PVQ info for a block
+                            &x->daala_enc);
 
   if (!skip)
     mbmi->skip = 0;
@@ -1059,7 +1058,8 @@ void vp10_xform_quant(MACROBLOCK *x, int plane, int block, int blk_row,
                             plane,          // image plane
                             tx_size,        // block size in log_2 - 2, 0 for 4x4.
                             &x->rate,       // rate measured
-                            pvq_info); // PVQ info for a block
+                            pvq_info, // PVQ info for a block
+                            &x->daala_enc);
 
   if (!skip)
     mbmi->skip = 0;
@@ -1570,7 +1570,8 @@ void vp10_encode_block_intra(int plane, int block, int blk_row, int blk_col,
                               plane,          // image plane
                               tx_size,        // block size in log_2 - 2, 0 for 4x4.
                               &x->rate,       // rate measured
-                              pvq_info);      // PVQ info for a block
+                              pvq_info,      // PVQ info for a block
+                              &x->daala_enc);
 
     if (!skip)
       mbmi->skip = 0;
@@ -1691,7 +1692,8 @@ int pvq_encode_helper(daala_enc_ctx *daala_enc,
 int pvq_encode_helper2(tran_low_t *const coeff, tran_low_t *ref_coeff,
     tran_low_t *const dqcoeff,
     uint16_t *eob, int quant,
-    int plane, int tx_size, int *rate, PVQ_INFO *pvq_info) {
+    int plane, int tx_size, int *rate, PVQ_INFO *pvq_info,
+    daala_enc_ctx *daala_enc) {
   const int tx_blk_size = 1 << (tx_size + 2);
   int skip;
   int j;
@@ -1726,9 +1728,9 @@ int pvq_encode_helper2(tran_low_t *const coeff, tran_low_t *ref_coeff,
     pvq_info->ref_coeff[i] = ref_coeff[i];
   }*/
 
-  tell = od_ec_enc_tell(&daala_enc.ec);
+  tell = od_ec_enc_tell(&daala_enc->ec);
 
-  skip = pvq_encode_helper(&daala_enc,    // daala encoder
+  skip = pvq_encode_helper(daala_enc,    // daala encoder
                            ref_coeff_pvq, // reference vector
                            coeff_pvq,     // target original vector
                            dqcoeff_pvq,   // de-quantized vector
@@ -1740,12 +1742,12 @@ int pvq_encode_helper2(tran_low_t *const coeff, tran_low_t *ref_coeff,
 
   // Encode residue of DC coeff, if required.
   if (!has_dc_skip || dqcoeff_pvq[0]) {
-    generic_encode(&daala_enc.ec, &daala_enc.state.adapt.model_dc[plane],
+    generic_encode(&daala_enc->ec, &daala_enc->state.adapt.model_dc[plane],
      abs(dqcoeff_pvq[0]) - has_dc_skip, -1,
-     &daala_enc.state.adapt.ex_dc[plane][tx_size][0], 2);
+     &daala_enc->state.adapt.ex_dc[plane][tx_size][0], 2);
   }
   if (dqcoeff_pvq[0]) {
-    od_ec_enc_bits(&daala_enc.ec, dqcoeff_pvq[0] < 0, 1);
+    od_ec_enc_bits(&daala_enc->ec, dqcoeff_pvq[0] < 0, 1);
     skip = 0;
   }
   // need to save quantized residue of DC coeff
@@ -1755,7 +1757,7 @@ int pvq_encode_helper2(tran_low_t *const coeff, tran_low_t *ref_coeff,
   dqcoeff_pvq[0] = dqcoeff_pvq[0] * pvq_dc_quant;
   dqcoeff_pvq[0] += ref_coeff_pvq[0];
 
-  *rate = od_ec_enc_tell(&daala_enc.ec) - tell;
+  *rate = od_ec_enc_tell(&daala_enc->ec) - tell;
 
   // Safely initialize dqcoeff since some coeffs (band size > 128 coeffs)
   // are skipped by PVQ.

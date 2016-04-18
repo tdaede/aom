@@ -2543,6 +2543,23 @@ void vp10_encode_tile(VP10_COMP *cpi, ThreadData *td, int tile_row,
   td->mb.m_search_count_ptr = &td->rd_counts.m_search_count;
   td->mb.ex_search_count_ptr = &td->rd_counts.ex_search_count;
 
+#if CONFIG_PVQ
+  td->mb.daala_enc.state.qm = (int16_t *)vpx_calloc(OD_QM_BUFFER_SIZE, sizeof(td->mb.daala_enc.state.qm[0]));
+  td->mb.daala_enc.state.qm_inv = (int16_t *)vpx_calloc(OD_QM_BUFFER_SIZE, sizeof(td->mb.daala_enc.state.qm_inv[0]));
+  td->mb.daala_enc.qm = OD_QM8_Q4_FLAT;  // Hard coded. Enc/dec required to sync.
+
+  od_init_qm(td->mb.daala_enc.state.qm, td->mb.daala_enc.state.qm_inv,
+      td->mb.daala_enc.qm == OD_HVS_QM ? OD_QM8_Q4_HVS : OD_QM8_Q4_FLAT);
+  od_ec_enc_init(&td->mb.daala_enc.ec, 65025);
+
+  od_adapt_ctx *adapt = &td->mb.daala_enc.state.adapt;
+  od_ec_enc_reset(&td->mb.daala_enc.ec);
+  od_adapt_ctx_reset(adapt, 0);
+  od_adapt_pvq_ctx_reset(&adapt->pvq, 0);
+  adapt->skip_increment = 128;
+  OD_CDFS_INIT(adapt->skip_cdf, adapt->skip_increment >> 2);
+#endif
+
   for (mi_row = tile_info->mi_row_start; mi_row < tile_info->mi_row_end;
        mi_row += MI_BLOCK_SIZE) {
     encode_rd_sb_row(cpi, td, this_tile, mi_row, &tok);
@@ -2551,6 +2568,12 @@ void vp10_encode_tile(VP10_COMP *cpi, ThreadData *td, int tile_row,
       (unsigned int)(tok - cpi->tile_tok[tile_row][tile_col]);
   assert(tok - cpi->tile_tok[tile_row][tile_col] <=
          allocated_tokens(*tile_info));
+
+#if CONFIG_PVQ
+  vpx_free(td->mb.daala_enc.state.qm);
+  vpx_free(td->mb.daala_enc.state.qm_inv);
+  od_ec_enc_clear(&td->mb.daala_enc.ec);
+#endif
 }
 
 static void encode_tiles(VP10_COMP *cpi) {
