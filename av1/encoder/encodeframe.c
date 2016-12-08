@@ -4943,9 +4943,11 @@ static void encode_frame_internal(AV1_COMP *cpi) {
   av1_initialize_me_consts(cpi, x, cm->base_qindex);
   init_encode_frame_mb_context(cpi);
 
-  cm->use_prev_frame_mvs =
+  cm->use_prev_frame_mvs = 0;
+  /*
       !cm->error_resilient_mode && cm->width == cm->last_width &&
       cm->height == cm->last_height && !cm->intra_only && cm->last_show_frame;
+  */
 
 #if CONFIG_DELTA_Q
   // Fix delta q resolution for the moment

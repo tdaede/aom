@@ -4496,10 +4496,12 @@ void av1_decode_frame(AV1Decoder *pbi, const uint8_t *data,
   cm->setup_mi(cm);
 #endif
 
-  cm->use_prev_frame_mvs =
+  cm->use_prev_frame_mvs = 0;
+  /*
       !cm->error_resilient_mode && cm->width == cm->last_width &&
       cm->height == cm->last_height && !cm->last_intra_only &&
       cm->last_show_frame && (cm->last_frame_type != KEY_FRAME);
+  */
 #if CONFIG_EXT_REFS
   // NOTE(zoeliu): As cm->prev_frame can take neither a frame of
   //               show_exisiting_frame=1, nor can it take a frame not used as
