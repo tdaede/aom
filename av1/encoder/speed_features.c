@@ -526,7 +526,7 @@ void av1_set_speed_features_framesize_independent(AV1_COMP *cpi) {
 #if CONFIG_EXT_TILE
   sf->use_upsampled_references = 0;
 #else
-  sf->use_upsampled_references = 1;
+  sf->use_upsampled_references = 0;
 #endif  // CONFIG_EXT_TILE
 #if CONFIG_EXT_INTER
   sf->disable_wedge_search_var_thresh = 0;
