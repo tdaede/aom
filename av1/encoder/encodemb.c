@@ -1324,9 +1324,9 @@ PVQ_SKIP_TYPE av1_pvq_encode_helper(MACROBLOCK *x, tran_low_t *const coeff,
   assert(OD_COEFF_SHIFT > coeff_shift);
   rounding_mask = (1 << (OD_COEFF_SHIFT - coeff_shift - 1)) - 1;
   for (i = 0; i < tx_blk_size * tx_blk_size; i++) {
+    out_int32[i] = AOM_SIGNED_SHL(out_int32[i], quantizer_downshift);
     dqcoeff_pvq[i] =
-        AOM_SIGNED_SHL(out_int32[i] + (out_int32[i] < 0) + rounding_mask,
-                       quantizer_downshift) >>
+      (out_int32[i] + (out_int32[i] < 0) + rounding_mask) >>
         (OD_COEFF_SHIFT - coeff_shift);
   }
 
