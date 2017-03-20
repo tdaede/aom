@@ -485,7 +485,7 @@ static int od_compute_var_4x4(od_coeff *x, int stride) {
 #define OD_DIST_LP_MID (5)
 #define OD_DIST_LP_NORM (OD_DIST_LP_MID + 2)
 
-static double od_compute_dist_8x8(int qm, int use_activity_masking, od_coeff *x,
+static double od_compute_dist_8x8(int qm, int bd, int use_activity_masking, od_coeff *x,
                                   od_coeff *y, od_coeff *e_lp, int stride) {
   double sum;
   int min_var;
@@ -509,6 +509,8 @@ static double od_compute_dist_8x8(int qm, int use_activity_masking, od_coeff *x,
       int vary;
       varx = od_compute_var_4x4(x + 2 * i * stride + 2 * j, stride);
       vary = od_compute_var_4x4(y + 2 * i * stride + 2 * j, stride);
+      varx >>= (bd - 8)*2;
+      vary >>= (bd - 8)*2;
       min_var = OD_MINI(min_var, varx);
       mean_var += 1. / (1 + varx);
       /* The cast to (double) is to avoid an overflow before the sqrt.*/
@@ -537,6 +539,7 @@ static double od_compute_dist_8x8(int qm, int use_activity_masking, od_coeff *x,
     for (j = 0; j < 8; j++)
       sum += e_lp[i * stride + j] * (double)e_lp[i * stride + j];
   }
+  sum *= 1. / (bd - 8)*(bd - 8)*4;
   /* Normalize the filter to unit DC response. */
   sum *= 1. / (OD_DIST_LP_NORM * OD_DIST_LP_NORM * OD_DIST_LP_NORM *
                OD_DIST_LP_NORM);
@@ -544,7 +547,7 @@ static double od_compute_dist_8x8(int qm, int use_activity_masking, od_coeff *x,
 }
 
 // Note : Inputs x and y are in a pixel domain
-static double od_compute_dist(int qm, int activity_masking, od_coeff *x,
+static double od_compute_dist(int qm, int bd, int activity_masking, od_coeff *x,
                               od_coeff *y, int bsize_w, int bsize_h,
                               int qindex) {
   int i;
@@ -559,6 +562,7 @@ static double od_compute_dist(int qm, int activity_masking, od_coeff *x,
       tmp = x[i] - y[i];
       sum += tmp * tmp;
     }
+    sum *= (bd - 8)*(bd - 8)*4;
   } else {
     int j;
     DECLARE_ALIGNED(16, od_coeff, e[MAX_TX_SQUARE]);
@@ -594,7 +598,7 @@ static double od_compute_dist(int qm, int activity_masking, od_coeff *x,
     }
     for (i = 0; i < bsize_h; i += 8) {
       for (j = 0; j < bsize_w; j += 8) {
-        sum += od_compute_dist_8x8(qm, activity_masking, &x[i * bsize_w + j],
+        sum += od_compute_dist_8x8(qm, bd, activity_masking, &x[i * bsize_w + j],
                                    &y[i * bsize_w + j], &e_lp[i * bsize_w + j],
                                    bsize_w);
       }
@@ -616,7 +620,7 @@ static double od_compute_dist(int qm, int activity_masking, od_coeff *x,
 
 static int64_t av1_daala_dist(const uint8_t *src, int src_stride,
                               const uint8_t *dst, int dst_stride, int tx_size,
-                              int qm, int use_activity_masking, int qindex) {
+                              int qm, int bd, int use_activity_masking, int qindex) {
   int i, j;
   int64_t d;
   const BLOCK_SIZE tx_bsize = txsize_to_bsize[tx_size];
@@ -626,14 +630,25 @@ static int64_t av1_daala_dist(const uint8_t *src, int src_stride,
   DECLARE_ALIGNED(16, od_coeff, rec[MAX_TX_SQUARE]);
 
   assert(qm == OD_HVS_QM);
+#if CONFIG_AOM_HIGHBITDEPTH
+  if (bd > 8) {
+    for (j = 0; j < bsh; j++)
+      for (i = 0; i < bsw; i++) orig[j * bsw + i] = CONVERT_TO_SHORTPTR(src)[j * src_stride + i];
 
-  for (j = 0; j < bsh; j++)
-    for (i = 0; i < bsw; i++) orig[j * bsw + i] = src[j * src_stride + i];
+    for (j = 0; j < bsh; j++)
+      for (i = 0; i < bsw; i++) rec[j * bsw + i] = CONVERT_TO_SHORTPTR(dst)[j * dst_stride + i];
+  } else {
+#endif // CONFIG_AOM_HIGHBITDEPTH
+    for (j = 0; j < bsh; j++)
+      for (i = 0; i < bsw; i++) orig[j * bsw + i] = src[j * src_stride + i];
 
-  for (j = 0; j < bsh; j++)
-    for (i = 0; i < bsw; i++) rec[j * bsw + i] = dst[j * dst_stride + i];
+    for (j = 0; j < bsh; j++)
+      for (i = 0; i < bsw; i++) rec[j * bsw + i] = dst[j * dst_stride + i];
+#if CONFIG_AOM_HIGHBITDEPTH
+  }
+#endif
 
-  d = (int64_t)od_compute_dist(qm, use_activity_masking, orig, rec, bsw, bsh,
+  d = (int64_t)od_compute_dist(qm, bd, use_activity_masking, orig, rec, bsw, bsh,
                                qindex);
   return d;
 }
@@ -1378,6 +1393,11 @@ static void dist_block(const AV1_COMP *cpi, MACROBLOCK *x, int plane,
   MACROBLOCKD *const xd = &x->e_mbd;
   const struct macroblock_plane *const p = &x->plane[plane];
   const struct macroblockd_plane *const pd = &xd->plane[plane];
+#if CONFIG_AOM_HIGHBITDEPTH
+  const int bd = (xd->cur_buf->flags & YV12_FLAG_HIGHBITDEPTH) ? xd->bd : 8;
+#else
+  const int bd = 8;
+#endif // CONFIG_AOM_HIGHBITDEPTH
 #if CONFIG_DAALA_DIST
   int qm = OD_HVS_QM;
   int use_activity_masking = 0;
@@ -1408,7 +1428,6 @@ static void dist_block(const AV1_COMP *cpi, MACROBLOCK *x, int plane,
                 shift;
 #endif  // CONFIG_AOM_HIGHBITDEPTH
 #elif CONFIG_AOM_HIGHBITDEPTH
-    const int bd = (xd->cur_buf->flags & YV12_FLAG_HIGHBITDEPTH) ? xd->bd : 8;
     *out_dist =
         av1_highbd_block_error(coeff, dqcoeff, buffer_length, &this_sse, bd) >>
         shift;
@@ -1441,7 +1460,7 @@ static void dist_block(const AV1_COMP *cpi, MACROBLOCK *x, int plane,
 #if CONFIG_DAALA_DIST
     if (plane == 0) {
       if (bsw >= 8 && bsh >= 8)
-        tmp = av1_daala_dist(src, src_stride, dst, dst_stride, tx_size, qm,
+        tmp = av1_daala_dist(src, src_stride, dst, dst_stride, tx_size, qm, bd,
                              use_activity_masking, x->qindex);
       else
         tmp = 0;
@@ -1497,7 +1516,7 @@ static void dist_block(const AV1_COMP *cpi, MACROBLOCK *x, int plane,
 #if CONFIG_DAALA_DIST
       if (plane == 0) {
         if (bsw >= 8 && bsh >= 8)
-          tmp = av1_daala_dist(src, src_stride, recon, MAX_TX_SIZE, tx_size, qm,
+          tmp = av1_daala_dist(src, src_stride, recon, MAX_TX_SIZE, tx_size, qm, bd,
                                use_activity_masking, x->qindex);
         else
           tmp = 0;
@@ -1533,6 +1552,11 @@ static void block_rd_txfm(int plane, int block, int blk_row, int blk_col,
 #if CONFIG_DAALA_DIST
   int qm = OD_HVS_QM;
   int use_activity_masking = 0;
+#if CONFIG_AOM_HIGHBITDEPTH
+  const int bd = (xd->cur_buf->flags & YV12_FLAG_HIGHBITDEPTH) ? xd->bd : 8;
+#else
+  const int bd = 8;
+#endif // CONFIG_AOM_HIGHBITDEPTH
 #if CONFIG_PVQ
   use_activity_masking = x->daala_enc.use_activity_masking;
 #endif  // CONFIG_PVQ
@@ -1587,13 +1611,23 @@ static void block_rd_txfm(int plane, int block, int blk_row, int blk_col,
           int i, j;
           DECLARE_ALIGNED(16, uint8_t, pred8[MAX_TX_SQUARE]);
 
-          for (j = 0; j < bsh; j++)
-            for (i = 0; i < bsw; i++)
-              pred8[j * bsw + i] = pred[j * diff_stride + i];
-
-          this_rd_stats.sse =
-              av1_daala_dist(src, src_stride, pred8, bsw, tx_size, qm,
+#if CONFIG_AOM_HIGHBITDEPTH
+          if (bd > 8) {
+            // use the 16 bit prediction directly
+            this_rd_stats.sse =
+              av1_daala_dist(src, src_stride, (uint8_t*)pred, diff_stride, tx_size, qm, bd,
                              use_activity_masking, x->qindex);
+          } else {
+#endif // CONFIG_AOM_HIGHBITDEPTH
+            for (j = 0; j < bsh; j++)
+              for (i = 0; i < bsw; i++)
+                pred8[j * bsw + i] = pred[j * diff_stride + i];
+            this_rd_stats.sse =
+              av1_daala_dist(src, src_stride, pred8, bsw, tx_size, qm, bd,
+                             use_activity_masking, x->qindex);
+#if CONFIG_AOM_HIGHBITDEPTH
+          }
+#endif // CONFIG_AOM_HIGHBITDEPTH
         } else {
           this_rd_stats.sse = 0;
         }
@@ -1619,7 +1653,7 @@ static void block_rd_txfm(int plane, int block, int blk_row, int blk_col,
         const int bsh = block_size_high[tx_bsize];
 
         if (bsw >= 8 && bsh >= 8)
-          tmp = av1_daala_dist(src, src_stride, dst, dst_stride, tx_size, qm,
+          tmp = av1_daala_dist(src, src_stride, dst, dst_stride, tx_size, qm, bd,
                                use_activity_masking, x->qindex);
         else
           tmp = 0;
@@ -1703,7 +1737,11 @@ static void block_8x8_rd_txfm_daala_dist(int plane, int block, int blk_row,
   RD_STATS this_rd_stats;
   int qm = OD_HVS_QM;
   int use_activity_masking = 0;
-
+#if CONFIG_AOM_HIGHBITDEPTH
+  const int bd = (xd->cur_buf->flags & YV12_FLAG_HIGHBITDEPTH) ? xd->bd : 8;
+#else
+  const int bd = 8;
+#endif // CONFIG_AOM_HIGHBITDEPTH
 #if CONFIG_PVQ
   use_activity_masking = x->daala_enc.use_activity_masking;
 #endif  // CONFIG_PVQ
@@ -1734,17 +1772,27 @@ static void block_8x8_rd_txfm_daala_dist(int plane, int block, int blk_row,
     const int tx_blk_size = 1 << (tx_size + 2);
     DECLARE_ALIGNED(16, uint8_t, pred8[MAX_TX_SQUARE]);
 
-    for (j = 0; j < tx_blk_size; j++)
-      for (i = 0; i < tx_blk_size; i++)
-        pred8[j * tx_blk_size + i] = pred[j * diff_stride + i];
-
-    this_rd_stats.sse =
-        av1_daala_dist(src, src_stride, pred8, tx_blk_size, tx_size, qm,
+    #ifdef CONFIG_AOM_HIGHBITDEPTH
+    if (bd > 8) {
+      this_rd_stats.sse =
+        av1_daala_dist(src, src_stride, (uint8_t*)pred, diff_stride, tx_size, qm, bd,
                        use_activity_masking, qindex);
+    } else {
+#endif // CONFIG_AOM_HIGHBITDEPTH
+      for (j = 0; j < tx_blk_size; j++)
+        for (i = 0; i < tx_blk_size; i++)
+          pred8[j * tx_blk_size + i] = pred[j * diff_stride + i];
+
+      this_rd_stats.sse =
+        av1_daala_dist(src, src_stride, pred8, tx_blk_size, tx_size, qm, bd,
+        use_activity_masking, qindex);
+#if CONFIG_AOM_HIGHBITDEPTH
+    }
+#endif // CONFIG_AOM_HIGHBITDEPTH
 
     this_rd_stats.sse = this_rd_stats.sse * 16;
 
-    tmp = av1_daala_dist(src, src_stride, dst, dst_stride, tx_size, qm,
+    tmp = av1_daala_dist(src, src_stride, dst, dst_stride, tx_size, qm, bd,
                          use_activity_masking, qindex);
 
     this_rd_stats.dist = (int64_t)tmp * 16;
@@ -3230,7 +3278,11 @@ static int64_t rd_pick_intra_sub_8x8_y_mode(const AV1_COMP *const cpi,
 #else
   const TX_SIZE tx_size = TX_4X4;
 #endif  // CONFIG_EXT_TX && CONFIG_RECT_TX
-
+#if CONFIG_AOM_HIGHBITDEPTH
+  const int bd = (xd->cur_buf->flags & YV12_FLAG_HIGHBITDEPTH) ? xd->bd : 8;
+#else
+  const int bd = 8;
+#endif // CONFIG_AOM_HIGHBITDEPTH
 #if CONFIG_EXT_INTRA
 #if CONFIG_INTRA_INTERP
   mbmi->intra_filter = INTRA_FILTER_LINEAR;
@@ -3303,7 +3355,7 @@ static int64_t rd_pick_intra_sub_8x8_y_mode(const AV1_COMP *const cpi,
 #endif  // CONFIG_PVQ
     // Daala-defined distortion computed for the block of 8x8 pixels
     total_distortion = av1_daala_dist(src, src_stride, dst, dst_stride, TX_8X8,
-                                      qm, use_activity_masking, mb->qindex)
+                                      qm, bd, use_activity_masking, mb->qindex)
                        << 4;
   }
 #endif  // CONFIG_DAALA_DIST
@@ -6810,12 +6862,12 @@ static int64_t rd_pick_inter_best_sub8x8_mode(
 
     // Daala-defined distortion computed for 1) predicted pixels and
     // 2) decoded pixels of the block of 8x8 pixels
-    bsi->sse = av1_daala_dist(src, src_stride, pred, 8, TX_8X8, qm,
+    bsi->sse = av1_daala_dist(src, src_stride, pred, 8, TX_8X8, qm, bd,
                               use_activity_masking, x->qindex)
                << 4;
 
     bsi->d = av1_daala_dist(src, src_stride, pd->dst.buf, dst_stride, TX_8X8,
-                            qm, use_activity_masking, x->qindex)
+                            qm, bd, use_activity_masking, x->qindex)
              << 4;
   }
 #endif  // CONFIG_DAALA_DIST
