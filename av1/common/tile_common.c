@@ -50,10 +50,10 @@ void av1_tile_init(TileInfo *tile, const AV1_COMMON *cm, int row, int col) {
 
 #if CONFIG_EXT_PARTITION
 #define MIN_TILE_WIDTH_MAX_SB 2
-#define MAX_TILE_WIDTH_MAX_SB 32
+#define MAX_TILE_WIDTH_MAX_SB 16
 #else
 #define MIN_TILE_WIDTH_MAX_SB 4
-#define MAX_TILE_WIDTH_MAX_SB 64
+#define MAX_TILE_WIDTH_MAX_SB 32
 #endif  // CONFIG_EXT_PARTITION
 
 static int get_min_log2_tile_cols(const int max_sb_cols) {
