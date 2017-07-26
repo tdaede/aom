@@ -22,7 +22,7 @@
 
 #include "av1/common/seg_common.h"
 
-#define PARALLEL_DEBLOCKING_15TAPLUMAONLY 1
+#define PARALLEL_DEBLOCKING_15TAPLUMAONLY 0
 
 // 64 bit masks for left transform size. Each 1 represents a position where
 // we should apply a loop filter across the left border of an 8x8 block
