@@ -297,9 +297,38 @@ static void setup_frame(AV1_COMP *cpi) {
     av1_setup_past_independence(cm);
   } else {
 #if CONFIG_NO_FRAME_CONTEXT_SIGNALING
-// Just use frame context from first signaled reference frame.
-// This will always be LAST_FRAME for now.
-#else
+    // Choose which type of frame we want in slot 0.
+    // We always swap LAST_FRAME with this slot.
+#if CONFIG_EXT_REFS
+    const GF_GROUP *gf_group = &cpi->twopass.gf_group;
+    int frame_type_for_context = LAST_FRAME;
+#if CONFIG_ALTREF2
+    if (gf_group->update_type[gf_group->index] == INTNL_ARF_UPDATE)
+#else  // !CONFIG_ALTREF2
+      if (gf_group->rf_level[gf_group->index] == GF_ARF_LOW)
+#endif  // CONFIG_ALTREF2
+        frame_type_for_context = ALTREF_FRAME;
+      else if (cpi->refresh_alt_ref_frame)
+        frame_type_for_context = ALTREF_FRAME;
+#else   // !CONFIG_EXT_REFS
+    if (cpi->refresh_alt_ref_frame) frame_type_for_context = ALTREF_FRAME;
+#endif  // CONFIG_EXT_REFS
+    else if (cpi->rc.is_src_frame_alt_ref)
+      frame_type_for_context = LAST_FRAME;
+    else if (cpi->refresh_golden_frame)
+      frame_type_for_context = GOLDEN_FRAME;
+#if CONFIG_EXT_REFS
+    else if (cpi->refresh_bwd_ref_frame)
+      frame_type_for_context = BWDREF_FRAME;
+#endif  // CONFIG_EXT_REFS
+    else
+      frame_type_for_context = LAST_FRAME;
+    assert(cm->ref_frame_map[LAST_FRAME] >= 0);
+    assert(cm->ref_frame_map[frame_type_for_context - LAST_FRAME] >= 0);
+    int tmp = cm->ref_frame_map[LAST_FRAME];
+    cm->ref_frame_map[LAST_FRAME] = cm->ref_frame_map[frame_type_for_context - LAST_FRAME];
+    cm->ref_frame_map[frame_type_for_context - LAST_FRAME] = tmp;
+#else // CONFIG_NO_FRAME_CONTEXT_SIGNALING
 #if CONFIG_EXT_REFS
     const GF_GROUP *gf_group = &cpi->twopass.gf_group;
 #if CONFIG_ALTREF2
