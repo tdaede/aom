@@ -305,9 +305,83 @@ static void setup_frame(AV1_COMP *cpi) {
     av1_setup_past_independence(cm);
   } else {
 #if CONFIG_NO_FRAME_CONTEXT_SIGNALING
-// Just use frame context from first signaled reference frame.
-// This will always be LAST_FRAME for now.
-#else
+    // Choose which type of frame we want in slot 0.
+    // We always swap LAST_FRAME with this slot.
+#if CONFIG_EXT_REFS
+    const GF_GROUP *gf_group = &cpi->twopass.gf_group;
+    int *fb_idx_for_context;
+#if CONFIG_ALTREF2
+    if (gf_group->update_type[gf_group->index] == INTNL_ARF_UPDATE)
+#else  // !CONFIG_ALTREF2
+      if (gf_group->rf_level[gf_group->index] == GF_ARF_LOW)
+#endif  // CONFIG_ALTREF2
+        fb_idx_for_context = &cpi->alt_fb_idx;
+      else if (cpi->refresh_alt_ref_frame)
+        fb_idx_for_context = &cpi->alt_fb_idx;
+#else   // !CONFIG_EXT_REFS
+    if (cpi->refresh_alt_ref_frame) fb_idx_for_context = &cpi->alt_fb_idx;
+#endif  // CONFIG_EXT_REFS
+    else if (cpi->rc.is_src_frame_alt_ref)
+      fb_idx_for_context = &cpi->lst_fb_idxes[0];
+    else if (cpi->refresh_golden_frame)
+      fb_idx_for_context = &cpi->gld_fb_idx;
+#if CONFIG_EXT_REFS
+    else if (cpi->refresh_bwd_ref_frame)
+      fb_idx_for_context = &cpi->bwd_fb_idx;
+#endif  // CONFIG_EXT_REFS
+    else
+      fb_idx_for_context = &cpi->lst_fb_idxes[0];
+    printf("*fb_idx_for_context = %d\n", *fb_idx_for_context);
+    for (int i = 0; i < 3; i++) {
+      printf("lst_fb_idxes[%d] = %d\n", i, cpi->lst_fb_idxes[i]);
+    }
+    printf("gld_fb_idx = %d\n", cpi->gld_fb_idx);
+    printf("bwd_fb_idx = %d\n", cpi->bwd_fb_idx);
+    printf("alt_fb_idx = %d\n", cpi->alt_fb_idx);
+    printf("Initial ref frame map\n");
+    assert(cm->ref_frame_map[0] >= 0);
+    assert(cm->ref_frame_map[*fb_idx_for_context] >= 0);
+    for (int i = 0; i < 6; i++) {
+      printf("ref_frame_map[%d] = %d\n",i,cm->ref_frame_map[i]);
+    }
+    printf("Reordering...\n");
+    int *fb_idx_zero;
+    // search for fb_idx that is currently slot 0
+    if (cpi->lst_fb_idxes[0] == 0) {
+      fb_idx_zero = &cpi->lst_fb_idxes[0];
+    } else if (cpi->lst_fb_idxes[1] == 0) {
+      fb_idx_zero = &cpi->lst_fb_idxes[1];
+    } else if (cpi->lst_fb_idxes[2] == 0) {
+      fb_idx_zero = &cpi->lst_fb_idxes[2];
+    } else if (cpi->gld_fb_idx == 0) {
+      fb_idx_zero = &cpi->gld_fb_idx;
+    } else if (cpi->bwd_fb_idx == 0) {
+      fb_idx_zero = &cpi->gld_fb_idx;
+    } else if (cpi->alt_fb_idx == 0) {
+      fb_idx_zero = &cpi->alt_fb_idx;
+    } else {
+      assert("No fb idx is currently slot 0");
+      return;
+    }
+    // swap underlying ref_frame_map
+    int tmp = cm->ref_frame_map[*fb_idx_zero];
+    cm->ref_frame_map[*fb_idx_zero] = cm->ref_frame_map[*fb_idx_for_context];
+    cm->ref_frame_map[*fb_idx_for_context] = tmp;
+    // swap fb_idxes
+    int tmp_fb = *fb_idx_zero;
+    *fb_idx_zero = *fb_idx_for_context;
+    *fb_idx_for_context = tmp_fb;
+    for (int i = 0; i < 3; i++) {
+      printf("lst_fb_idxes[%d] = %d\n", i, cpi->lst_fb_idxes[i]);
+    }
+    printf("gld_fb_idx = %d\n", cpi->gld_fb_idx);
+    printf("bwd_fb_idx = %d\n", cpi->bwd_fb_idx);
+    printf("alt_fb_idx = %d\n", cpi->alt_fb_idx);
+    printf("Initial ref frame map\n");
+    for (int i = 0; i < 6; i++) {
+      printf("ref_frame_map[%d] = %d\n",i,cm->ref_frame_map[i]);
+    }
+#else // CONFIG_NO_FRAME_CONTEXT_SIGNALING
 #if CONFIG_EXT_REFS
     const GF_GROUP *gf_group = &cpi->twopass.gf_group;
     if (gf_group->update_type[gf_group->index] == INTNL_ARF_UPDATE)
