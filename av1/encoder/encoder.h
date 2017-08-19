@@ -415,6 +415,13 @@ typedef struct AV1_COMP {
 #endif              // CONFIG_EXT_REFS
   int alt_fb_idx;
 
+  // for each ref type (LAST_FRAME etc), indicates which of the 8 frame
+  // stores should be used for the current frame
+  int ref_type_store_idx[TOTAL_REFS_PER_FRAME];
+
+  // this is which buffer to store the last frame in. it counts 2->1->0->2
+  int last_frame_store_idx;
+
   int last_show_frame_buf_idx;  // last show frame buffer index
 
   int refresh_last_frame;
