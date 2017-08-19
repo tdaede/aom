@@ -3661,7 +3661,6 @@ static void write_tile_info(const AV1_COMMON *const cm,
 #if USE_GF16_MULTI_LAYER
 static int get_refresh_mask_gf16(AV1_COMP *cpi) {
   int refresh_mask = 0;
-
   if (cpi->refresh_last_frame || cpi->refresh_golden_frame ||
       cpi->refresh_bwd_ref_frame || cpi->refresh_alt2_ref_frame ||
       cpi->refresh_alt_ref_frame) {
@@ -3676,6 +3675,7 @@ static int get_refresh_mask_gf16(AV1_COMP *cpi) {
 
 static int get_refresh_mask(AV1_COMP *cpi) {
   int refresh_mask = 0;
+  printf("getting refresh mask\n");
 #if CONFIG_EXT_REFS
 #if USE_GF16_MULTI_LAYER
   if (cpi->rc.baseline_gf_interval == 16) return get_refresh_mask_gf16(cpi);
@@ -3689,8 +3689,13 @@ static int get_refresh_mask(AV1_COMP *cpi) {
   // (2) The original virtual indexes for LAST_FRAME and LAST2_FRAME will be
   //     shifted and become the new virtual indexes for LAST2_FRAME and
   //     LAST3_FRAME.
+  /*
   refresh_mask |=
       (cpi->refresh_last_frame << cpi->lst_fb_idxes[LAST_REF_FRAMES - 1]);
+ */
+  refresh_mask |=
+    (cpi->refresh_last_frame << cpi->ref_type_store_idx[LAST3_FRAME - LAST_FRAME]);
+  
 
   refresh_mask |= (cpi->refresh_bwd_ref_frame << cpi->bwd_fb_idx);
   refresh_mask |= (cpi->refresh_alt2_ref_frame << cpi->alt2_fb_idx);
@@ -3709,7 +3714,7 @@ static int get_refresh_mask(AV1_COMP *cpi) {
     // Note: This is highly specific to the use of ARF as a forward reference,
     // and this needs to be generalized as other uses are implemented
     // (like RTC/temporal scalability).
-    return refresh_mask | (cpi->refresh_golden_frame << cpi->alt_fb_idx);
+    return refresh_mask | (cpi->refresh_golden_frame << cpi->ref_type_store_idx[ALTREF_FRAME - LAST_FRAME]);
   } else {
 #if CONFIG_EXT_REFS
     const int arf_idx = cpi->alt_fb_idx;
@@ -3720,7 +3725,7 @@ static int get_refresh_mask(AV1_COMP *cpi) {
       arf_idx = gf_group->arf_update_idx[gf_group->index];
     }
 #endif  // CONFIG_EXT_REFS
-    return refresh_mask | (cpi->refresh_golden_frame << cpi->gld_fb_idx) |
+    return refresh_mask | (cpi->refresh_golden_frame << cpi->ref_type_store_idx[GOLDEN_FRAME - LAST_FRAME]) |
            (cpi->refresh_alt_ref_frame << arf_idx);
   }
 }
@@ -4466,6 +4471,7 @@ static void write_uncompressed_header(AV1_COMP *cpi,
 #endif
 #if CONFIG_EXT_REFS
     cpi->refresh_frame_mask = get_refresh_mask(cpi);
+    printf("frame mask: %x\n", cpi->refresh_frame_mask);
 #endif  // CONFIG_EXT_REFS
 
     if (cm->intra_only) {
@@ -4503,12 +4509,14 @@ static void write_uncompressed_header(AV1_COMP *cpi,
 
       for (ref_frame = LAST_FRAME; ref_frame <= ALTREF_FRAME; ++ref_frame) {
         assert(get_ref_frame_map_idx(cpi, ref_frame) != INVALID_IDX);
-        aom_wb_write_literal(wb, get_ref_frame_map_idx(cpi, ref_frame),
+        /*assert(get_ref_frame_map_idx(cpi, ref_frame) == cpi->ref_type_store_idx[ref_frame - LAST_FRAME]);*/
+        aom_wb_write_literal(wb, cpi->ref_type_store_idx[ref_frame - LAST_FRAME],
                              REF_FRAMES_LOG2);
         aom_wb_write_bit(wb, cm->ref_frame_sign_bias[ref_frame]);
 #if CONFIG_REFERENCE_BUFFER
         if (cpi->seq_params.frame_id_numbers_present_flag) {
-          int i = get_ref_frame_map_idx(cpi, ref_frame);
+          //int i = get_ref_frame_map_idx(cpi, ref_frame);
+          int i = cpi->ref_type_store_idx[ref_frame - LAST_FRAME];
           int frame_id_len = cpi->seq_params.frame_id_length_minus7 + 7;
           int diff_len = cpi->seq_params.delta_frame_id_length_minus2 + 2;
           int delta_frame_id_minus1 =

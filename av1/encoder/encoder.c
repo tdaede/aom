@@ -381,6 +381,7 @@ static void setup_frame(AV1_COMP *cpi) {
     for (int i = 0; i < 6; i++) {
       printf("ref_frame_map[%d] = %d\n",i,cm->ref_frame_map[i]);
     }
+    
 #else // CONFIG_NO_FRAME_CONTEXT_SIGNALING
 #if CONFIG_EXT_REFS
     const GF_GROUP *gf_group = &cpi->twopass.gf_group;
@@ -1056,6 +1057,7 @@ static void update_frame_size(AV1_COMP *cpi) {
 }
 
 static void init_buffer_indices(AV1_COMP *cpi) {
+  printf("initing buffer indices\n");
 #if CONFIG_EXT_REFS
   int fb_idx;
   for (fb_idx = 0; fb_idx < LAST_REF_FRAMES; ++fb_idx)
@@ -3522,6 +3524,7 @@ static void update_reference_frames_gf16(AV1_COMP *cpi) {
 static void update_reference_frames(AV1_COMP *cpi) {
   AV1_COMMON *const cm = &cpi->common;
 
+  printf("updating reference frames\n");
   // NOTE: Save the new show frame buffer index for --test-code=warn, i.e.,
   //       for the purpose to verify no mismatch between encoder and decoder.
   if (cm->show_frame) cpi->last_show_frame_buf_idx = cm->new_fb_idx;
@@ -3539,6 +3542,11 @@ static void update_reference_frames(AV1_COMP *cpi) {
   // At this point the new frame has been encoded.
   // If any buffer copy / swapping is signaled it should be done here.
   if (cm->frame_type == KEY_FRAME) {
+    printf("is key frame\n");
+    for (int fb_idx = 0; fb_idx < TOTAL_REFS_PER_FRAME; fb_idx++) {
+      cpi->ref_type_store_idx[fb_idx] = fb_idx;
+    }
+    cpi->last_frame_store_idx = 2;
     ref_cnt_fb(pool->frame_bufs, &cm->ref_frame_map[cpi->gld_fb_idx],
                cm->new_fb_idx);
 #if CONFIG_EXT_REFS
@@ -3695,9 +3703,16 @@ static void update_reference_frames(AV1_COMP *cpi) {
                  cm->new_fb_idx);
 
       tmp = cpi->lst_fb_idxes[LAST_REF_FRAMES - 1];
-
       shift_last_ref_frames(cpi);
       cpi->lst_fb_idxes[0] = tmp;
+      printf("last_frame_store_idx=%d\n", cpi->last_frame_store_idx);
+      tmp = cpi->ref_type_store_idx[LAST3_FRAME - LAST_FRAME];
+      cpi->ref_type_store_idx[LAST3_FRAME - LAST_FRAME] = cpi->ref_type_store_idx[LAST2_FRAME - LAST_FRAME];
+      cpi->ref_type_store_idx[LAST2_FRAME - LAST_FRAME] = cpi->ref_type_store_idx[LAST_FRAME - LAST_FRAME];
+      cpi->ref_type_store_idx[LAST_FRAME - LAST_FRAME] = tmp;
+
+      cpi->last_frame_store_idx--;
+      if (cpi->last_frame_store_idx < 0) cpi->last_frame_store_idx = LAST_REF_FRAMES - 1;
 
       assert(cm->show_existing_frame == 0);
       memcpy(cpi->interp_filter_selected[LAST_FRAME],
