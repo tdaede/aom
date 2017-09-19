@@ -303,6 +303,7 @@ static void setup_frame(AV1_COMP *cpi) {
   // context 1 for ALTREF frames and context 0 for the others.
   if (frame_is_intra_only(cm) || cm->error_resilient_mode) {
     av1_setup_past_independence(cm);
+    cpi->first_golden_after_keyframe = 1;
   } else {
 #if CONFIG_NO_FRAME_CONTEXT_SIGNALING
     // Choose which type of frame we want in slot 0.
@@ -323,8 +324,14 @@ static void setup_frame(AV1_COMP *cpi) {
 #endif  // CONFIG_EXT_REFS
     else if (cpi->rc.is_src_frame_alt_ref)
       fb_idx_for_context = &cpi->lst_fb_idxes[0];
-    else if (cpi->refresh_golden_frame)
-      fb_idx_for_context = &cpi->gld_fb_idx;
+    else if (cpi->refresh_golden_frame) {
+      if (cpi->first_golden_after_keyframe) {
+        fb_idx_for_context = &cpi->lst_fb_idxes[0];
+        cpi->first_golden_after_keyframe = 0;
+      } else {
+        fb_idx_for_context = &cpi->gld_fb_idx;
+      }
+    }
 #if CONFIG_EXT_REFS
     else if (cpi->refresh_bwd_ref_frame)
       fb_idx_for_context = &cpi->bwd_fb_idx;

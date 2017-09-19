@@ -444,6 +444,13 @@ typedef struct AV1_COMP {
 #endif  // CONFIG_EXT_REFS
   int refresh_alt_ref_frame;
 
+#if CONFIG_NO_FRAME_CONTEXT_SIGNALING
+  // while setup_frame() normally uses the previous golden frame context for
+  // a current golden frame, we don't want to do that if it was a keyframe
+  // as the last frame context will be more accurate.
+  int first_golden_after_keyframe;
+#endif
+
   int ext_refresh_frame_flags_pending;
   int ext_refresh_last_frame;
   int ext_refresh_golden_frame;
