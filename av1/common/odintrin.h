@@ -24,7 +24,7 @@
 #include "aom/aom_integer.h"
 #include "aom_dsp/aom_dsp_common.h"
 #include "aom_ports/bitops.h"
-#include "av1/common/enums.h"
+//#include "av1/common/enums.h"
 
 #ifdef __cplusplus
 extern "C" {
