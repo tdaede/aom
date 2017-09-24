@@ -2449,7 +2449,7 @@ static const aom_cdf_prob
 #endif  // CONFIG_NEW_MULTISYMBOL
 
 #if CONFIG_NEW_MULTISYMBOL
-static const aom_cdf_prob default_skip_cdfs[SKIP_CONTEXTS][CDF_SIZE(2)] = {
+const aom_cdf_prob default_skip_cdfs[SKIP_CONTEXTS][CDF_SIZE(2)] = {
   { AOM_ICDF(24576), AOM_ICDF(32768), 0 },
   { AOM_ICDF(16384), AOM_ICDF(32768), 0 },
   { AOM_ICDF(8192), AOM_ICDF(32768), 0 }
@@ -2781,7 +2781,7 @@ static const aom_cdf_prob
       },
     };
 
-static const aom_cdf_prob
+const aom_cdf_prob
     default_uv_mode_cdf[INTRA_MODES][CDF_SIZE(UV_INTRA_MODES)] = {
       {
           AOM_ICDF(25472), AOM_ICDF(27697), AOM_ICDF(30693), AOM_ICDF(30916),
@@ -2909,7 +2909,7 @@ static const aom_cdf_prob
 #endif
     };
 #else
-static const aom_cdf_prob
+const aom_cdf_prob
     default_partition_cdf[PARTITION_CONTEXTS][CDF_SIZE(PARTITION_TYPES)] = {
       { AOM_ICDF(25472), AOM_ICDF(28949), AOM_ICDF(31052), AOM_ICDF(32768), 0 },
       { AOM_ICDF(18816), AOM_ICDF(22250), AOM_ICDF(28783), AOM_ICDF(32768), 0 },
@@ -2937,7 +2937,7 @@ static const aom_cdf_prob
 #endif
 
 #if CONFIG_EXT_TX
-static const aom_cdf_prob default_intra_ext_tx_cdf
+const aom_cdf_prob default_intra_ext_tx_cdf
     [EXT_TX_SETS_INTRA][EXT_TX_SIZES][INTRA_MODES][CDF_SIZE(TX_TYPES)] = {
       {
           // FIXME: unused zero positions, from uncoded trivial transform set
@@ -6661,7 +6661,6 @@ void av1_setup_past_independence(AV1_COMMON *cm) {
 
   // To force update of the sharpness
   lf->last_sharpness_level = -1;
-
   av1_default_coef_probs(cm);
   init_mode_probs(cm->fc);
   av1_init_mv_probs(cm);
