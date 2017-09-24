@@ -14,7 +14,7 @@
 #include "av1/common/common_data.h"
 #include "av1/common/scan.h"
 
-DECLARE_ALIGNED(16, static const int16_t, default_scan_4x4[16]) = {
+DECLARE_ALIGNED(16, const int16_t, default_scan_4x4[16]) = {
   0, 4, 1, 5, 8, 2, 12, 9, 3, 6, 13, 10, 7, 14, 11, 15,
 };
 
@@ -1800,7 +1800,7 @@ DECLARE_ALIGNED(16, static const int16_t, default_scan_64x64[4096]) = {
 
 // Neighborhood 2-tuples for various scans and blocksizes,
 // in {top, left} order for each position in corresponding scan order.
-DECLARE_ALIGNED(16, static const int16_t,
+DECLARE_ALIGNED(16, const int16_t,
                 default_scan_4x4_neighbors[17 * MAX_NEIGHBORS]) = {
   0, 0, 0, 0, 4,  0, 1, 4, 4, 5,  5,  1, 8,  8,  5,  8, 2,
   2, 2, 5, 9, 12, 6, 9, 3, 6, 10, 13, 7, 10, 11, 14, 0, 0,
