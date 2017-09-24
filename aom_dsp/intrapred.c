@@ -695,7 +695,7 @@ static INLINE void highbd_v_predictor(uint16_t *dst, ptrdiff_t stride, int bw,
   }
 }
 
-static INLINE void highbd_h_predictor(uint16_t *dst, ptrdiff_t stride, int bw,
+void highbd_h_predictor(uint16_t *dst, ptrdiff_t stride, int bw,
                                       int bh, const uint16_t *above,
                                       const uint16_t *left, int bd) {
   int r;
@@ -933,7 +933,7 @@ static INLINE void highbd_dc_128_predictor(uint16_t *dst, ptrdiff_t stride,
   }
 }
 
-static INLINE void highbd_dc_left_predictor(uint16_t *dst, ptrdiff_t stride,
+void highbd_dc_left_predictor(uint16_t *dst, ptrdiff_t stride,
                                             int bw, int bh,
                                             const uint16_t *above,
                                             const uint16_t *left, int bd) {
@@ -950,7 +950,7 @@ static INLINE void highbd_dc_left_predictor(uint16_t *dst, ptrdiff_t stride,
   }
 }
 
-static INLINE void highbd_dc_top_predictor(uint16_t *dst, ptrdiff_t stride,
+void highbd_dc_top_predictor(uint16_t *dst, ptrdiff_t stride,
                                            int bw, int bh,
                                            const uint16_t *above,
                                            const uint16_t *left, int bd) {
@@ -967,7 +967,7 @@ static INLINE void highbd_dc_top_predictor(uint16_t *dst, ptrdiff_t stride,
   }
 }
 
-static INLINE void highbd_dc_predictor(uint16_t *dst, ptrdiff_t stride, int bw,
+void highbd_dc_predictor(uint16_t *dst, ptrdiff_t stride, int bw,
                                        int bh, const uint16_t *above,
                                        const uint16_t *left, int bd) {
   int i, r, expected_dc, sum = 0;
