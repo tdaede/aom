@@ -2041,7 +2041,7 @@ static const aom_cdf_prob
 
 static const aom_prob default_skip_probs[SKIP_CONTEXTS] = { 192, 128, 64 };
 #if CONFIG_NEW_MULTISYMBOL
-static const aom_cdf_prob default_skip_cdfs[SKIP_CONTEXTS][CDF_SIZE(2)] = {
+const aom_cdf_prob default_skip_cdfs[SKIP_CONTEXTS][CDF_SIZE(2)] = {
   { AOM_ICDF(24576), AOM_ICDF(32768), 0 },
   { AOM_ICDF(16384), AOM_ICDF(32768), 0 },
   { AOM_ICDF(8192), AOM_ICDF(32768), 0 }
@@ -2703,7 +2703,7 @@ static const aom_cdf_prob
         AOM_ICDF(25817), AOM_ICDF(26876), AOM_ICDF(32768), 0 },
     };
 
-static const aom_cdf_prob
+const aom_cdf_prob
     default_uv_mode_cdf[INTRA_MODES][CDF_SIZE(INTRA_MODES)] = {
       { AOM_ICDF(25472), AOM_ICDF(25558), AOM_ICDF(27783), AOM_ICDF(30779),
         AOM_ICDF(30988), AOM_ICDF(31269), AOM_ICDF(31492), AOM_ICDF(31741),
@@ -2860,7 +2860,7 @@ static const aom_cdf_prob
 #endif
     };
 #else
-static const aom_cdf_prob
+const aom_cdf_prob
     default_partition_cdf[PARTITION_CONTEXTS][CDF_SIZE(PARTITION_TYPES)] = {
       { AOM_ICDF(25472), AOM_ICDF(28949), AOM_ICDF(31052), AOM_ICDF(32768), 0 },
       { AOM_ICDF(18816), AOM_ICDF(22250), AOM_ICDF(28783), AOM_ICDF(32768), 0 },
@@ -2888,7 +2888,7 @@ static const aom_cdf_prob
 #endif
 
 #if CONFIG_EXT_TX
-static const aom_cdf_prob default_intra_ext_tx_cdf
+const aom_cdf_prob default_intra_ext_tx_cdf
     [EXT_TX_SETS_INTRA][EXT_TX_SIZES][INTRA_MODES][CDF_SIZE(TX_TYPES)] = {
       {
 // FIXME: unused zero positions, from uncoded trivial transform set
@@ -5260,7 +5260,6 @@ void av1_setup_past_independence(AV1_COMMON *cm) {
 
   // To force update of the sharpness
   lf->last_sharpness_level = -1;
-
   av1_default_coef_probs(cm);
   init_mode_probs(cm->fc);
   av1_init_mv_probs(cm);
@@ -5273,6 +5272,12 @@ void av1_setup_past_independence(AV1_COMMON *cm) {
   av1_convolve_init(cm);
   cm->fc->initialized = 1;
 
+#if CONFIG_FRAME_CONTEXT_SIGNALING
+  if (cm->frame_type == KEY_FRAME) {
+    // Reset all frame contexts, as all reference frames will be lost.
+    for (i = 0; i < FRAME_CONTEXTS; ++i) cm->frame_contexts[i] = *cm->fc;
+  }
+#else
   if (cm->frame_type == KEY_FRAME || cm->error_resilient_mode ||
       cm->reset_frame_context == RESET_FRAME_CONTEXT_ALL) {
     // Reset all frame contexts.
@@ -5281,11 +5286,13 @@ void av1_setup_past_independence(AV1_COMMON *cm) {
     // Reset only the frame context specified in the frame header.
     cm->frame_contexts[cm->frame_context_idx] = *cm->fc;
   }
+#endif  // CONFIG_FRAME_CONTEXT_SIGNALING
 
   // prev_mip will only be allocated in encoder.
   if (frame_is_intra_only(cm) && cm->prev_mip && !cm->frame_parallel_decode)
     memset(cm->prev_mip, 0,
            cm->mi_stride * (cm->mi_rows + 1) * sizeof(*cm->prev_mip));
-
+#if !CONFIG_FRAME_CONTEXT_SIGNALING
   cm->frame_context_idx = 0;
+#endif  // !CONFIG_FRAME_CONTEXT_SIGNALING
 }

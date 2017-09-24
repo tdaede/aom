@@ -120,7 +120,7 @@ tran_low_t av1_dequant_coeff_nuq(int v, int q, const tran_low_t *dq) {
 }
 #endif  // CONFIG_NEW_QUANT
 
-static const int16_t dc_qlookup[QINDEX_RANGE] = {
+const int16_t dc_qlookup[QINDEX_RANGE] = {
   4,    8,    8,    9,    10,  11,  12,  12,  13,  14,  15,   16,   17,   18,
   19,   19,   20,   21,   22,  23,  24,  25,  26,  26,  27,   28,   29,   30,
   31,   32,   32,   33,   34,  35,  36,  37,  38,  38,  39,   40,   41,   42,
@@ -194,7 +194,7 @@ static const int16_t dc_qlookup_12[QINDEX_RANGE] = {
 };
 #endif
 
-static const int16_t ac_qlookup[QINDEX_RANGE] = {
+const int16_t ac_qlookup[QINDEX_RANGE] = {
   4,    8,    9,    10,   11,   12,   13,   14,   15,   16,   17,   18,   19,
   20,   21,   22,   23,   24,   25,   26,   27,   28,   29,   30,   31,   32,
   33,   34,   35,   36,   37,   38,   39,   40,   41,   42,   43,   44,   45,
@@ -368,12 +368,17 @@ void aom_qm_init(AV1_COMMON *cm) {
         current = 0;
         for (t = 0; t < TX_SIZES_ALL; ++t) {
           size = tx_size_2d[t];
-          cm->gqmatrix[q][c][f][t] = &wt_matrix_ref[AOMMIN(
-              NUM_QM_LEVELS - 1, f == 0 ? q + DEFAULT_QM_INTER_OFFSET : q)][c]
-                                                   [current];
-          cm->giqmatrix[q][c][f][t] = &iwt_matrix_ref[AOMMIN(
-              NUM_QM_LEVELS - 1, f == 0 ? q + DEFAULT_QM_INTER_OFFSET : q)][c]
+          if (q == NUM_QM_LEVELS - 1) {
+            cm->gqmatrix[q][c][f][t] = NULL;
+            cm->giqmatrix[q][c][f][t] = NULL;
+          } else {
+            cm->gqmatrix[q][c][f][t] = &wt_matrix_ref[AOMMIN(
+                NUM_QM_LEVELS - 1, f == 0 ? q + DEFAULT_QM_INTER_OFFSET : q)][c]
                                                      [current];
+            cm->giqmatrix[q][c][f][t] = &iwt_matrix_ref[AOMMIN(
+                NUM_QM_LEVELS - 1, f == 0 ? q + DEFAULT_QM_INTER_OFFSET : q)][c]
+                                                       [current];
+          }
           current += size;
         }
       }
@@ -14039,7 +14044,7 @@ static uint16_t wt_matrix_ref[NUM_QM_LEVELS][2][QM_TOTAL_SIZE] = {
 };
 #endif
 
-#if CONFIG_PVQ || CONFIG_DAALA_DIST
+#if CONFIG_PVQ
 /* Quantization matrices for 8x8. For other block sizes, we currently just do
    resampling. */
 /* Flat quantization, i.e. optimize for PSNR. */
