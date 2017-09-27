@@ -423,6 +423,8 @@ typedef struct AV1_COMP {
   int ext_fb_idx;      // extra ref frame buffer index
   int refresh_fb_idx;  // ref frame buffer index to refresh
 
+  MV_REFERENCE_FRAME frame_slot_to_usage[TOTAL_REFS_PER_FRAME];
+
   int last_show_frame_buf_idx;  // last show frame buffer index
 
   int refresh_last_frame;
@@ -430,6 +432,9 @@ typedef struct AV1_COMP {
   int refresh_bwd_ref_frame;
   int refresh_alt2_ref_frame;
   int refresh_alt_ref_frame;
+
+  int last_frame_is_golden_frame;
+  int last_golden_frame_is_keyframe;
 
   int ext_refresh_frame_flags_pending;
   int ext_refresh_last_frame;
@@ -673,6 +678,10 @@ static INLINE int frame_is_kf_gf_arf(const AV1_COMP *cpi) {
 
 static INLINE int get_ref_frame_map_idx(const AV1_COMP *cpi,
                                         MV_REFERENCE_FRAME ref_frame) {
+#if CONFIG_NO_FRAME_CONTEXT_SIGNALING
+  // map the physical slot (ref frame passed in) to what it's used for
+  ref_frame = cpi->frame_slot_to_usage[ref_frame - LAST_FRAME];
+#endif // CONFIG_NO_FRAME_CONTEXT_SIGNALING
   if (ref_frame >= LAST_FRAME && ref_frame <= LAST3_FRAME)
     return cpi->lst_fb_idxes[ref_frame - 1];
   else if (ref_frame == GOLDEN_FRAME)

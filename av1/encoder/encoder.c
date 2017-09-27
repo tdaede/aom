@@ -317,6 +317,48 @@ static BLOCK_SIZE select_sb_size(const AV1_COMP *const cpi) {
 #endif  //  CONFIG_EXT_PARTITION
 }
 
+static void setup_frame_slot_reordering(AV1_COMP *cpi) {
+  //  printf("setting up frame slot reordering\n");
+  AV1_COMMON *const cm = &cpi->common;
+  for (int i = LAST_FRAME; i <= ALTREF_FRAME; i++) {
+    cpi->frame_slot_to_usage[i - LAST_FRAME] = i;
+  }
+  if (cpi->refresh_alt_ref_frame) {
+    int tmp = cpi->frame_slot_to_usage[ALTREF_FRAME - LAST_FRAME];
+    cpi->frame_slot_to_usage[ALTREF_FRAME - LAST_FRAME] =
+        cpi->frame_slot_to_usage[LAST_FRAME - LAST_FRAME];
+    cpi->frame_slot_to_usage[LAST_FRAME - LAST_FRAME] = tmp;
+  }
+  /*
+  if (cpi->refresh_golden_frame && !cpi->last_golden_frame_is_keyframe) {
+    // load probabilities from previous golden frame rather than last frame,
+    // but only if the previous keyframe has inter probs (i.e. not keyframe)
+    // we may have actually written the golden into the alt slot
+    //if (get_ref_frame_buf_idx(cpi, cpi->alt_fb_idx)) {
+      int tmp = cpi->frame_slot_to_usage[ALTREF_FRAME - LAST_FRAME];
+      cpi->frame_slot_to_usage[ALTREF_FRAME - LAST_FRAME] =
+  cpi->frame_slot_to_usage[LAST_FRAME - LAST_FRAME];
+      cpi->frame_slot_to_usage[LAST_FRAME - LAST_FRAME] = tmp;
+      //}
+      cpi->last_frame_is_golden_frame = 1;
+  } else if (cpi->last_frame_is_golden_frame) {
+    // use LAST2_FRAME so that we skip over the golden frame
+    int tmp = cpi->frame_slot_to_usage[LAST2_FRAME - LAST_FRAME];
+    cpi->frame_slot_to_usage[LAST2_FRAME - LAST_FRAME] =
+  cpi->frame_slot_to_usage[LAST_FRAME - LAST_FRAME];
+    cpi->frame_slot_to_usage[LAST_FRAME - LAST_FRAME] = tmp;
+    cpi->last_frame_is_golden_frame = 0;
+  }
+  if (cpi->refresh_golden_frame) {
+    cpi->last_golden_frame_is_keyframe = frame_is_intra_only(cm);
+  }
+  */
+  for (int i = LAST_FRAME; i <= ALTREF_FRAME; i++) {
+    printf("frame_slot_to_usage[%d] = %d\n", i - LAST_FRAME,
+           cpi->frame_slot_to_usage[i - LAST_FRAME]);
+  }
+}
+
 static void setup_frame(AV1_COMP *cpi) {
   AV1_COMMON *const cm = &cpi->common;
   // Set up entropy context depending on frame type. The decoder mandates
@@ -4770,7 +4812,9 @@ static void encode_without_recode_loop(AV1_COMP *cpi) {
   aom_clear_system_state();
 
   set_size_independent_vars(cpi);
-
+#if CONFIG_NO_FRAME_CONTEXT_SIGNALING
+  setup_frame_slot_reordering(cpi);
+#endif
   setup_frame_size(cpi);
 
   assert(cm->width == cpi->scaled_source.y_crop_width);
@@ -4844,6 +4888,9 @@ static void encode_with_recode_loop(AV1_COMP *cpi, size_t *size,
 #endif
 
   aom_clear_system_state();
+#if CONFIG_NO_FRAME_CONTEXT_SIGNALING
+  setup_frame_slot_reordering(cpi);
+#endif
   setup_frame_size(cpi);
   set_size_dependent_vars(cpi, &q, &bottom_index, &top_index);
 
@@ -6618,6 +6665,9 @@ int av1_get_compressed_data(AV1_COMP *cpi, unsigned int *frame_flags,
 #else
     av1_rc_get_second_pass_params(cpi);
   } else if (oxcf->pass == 1) {
+#if CONFIG_NO_FRAME_CONTEXT_SIGNALING
+    setup_frame_slot_reordering(cpi);
+#endif
     setup_frame_size(cpi);
   }
 #endif
