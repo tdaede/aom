@@ -304,6 +304,20 @@ static BLOCK_SIZE select_sb_size(const AV1_COMP *const cpi) {
 #endif  //  CONFIG_EXT_PARTITION
 }
 
+static void setup_frame_slot_reordering(AV1_COMP *cpi) {
+  AV1_COMMON *const cm = &cpi->common;
+  for (int i = 0; i < ALTREF_FRAME - LAST_FRAME; i++) {
+    cpi->frame_slot_to_usage[i] = i;
+  }
+  if (cpi->refresh_golden_frame) {
+    if (get_ref_frame_buf_idx(cpi, cpi->gld_fb_idx)) {
+      int tmp = cpi->frame_slot_to_usage[GOLDEN_FRAME - LAST_FRAME];
+      cpi->frame_slot_to_usage[GOLDEN_FRAME - LAST_FRAME] = cpi->frame_slot_to_usage[LAST_FRAME - LAST_FRAME];
+      cpi->frame_slot_to_usage[LAST_FRAME - LAST_FRAME] = tmp;
+    }
+  }
+}
+
 static void setup_frame(AV1_COMP *cpi) {
   AV1_COMMON *const cm = &cpi->common;
   // Set up entropy context depending on frame type. The decoder mandates
@@ -4519,7 +4533,9 @@ static void encode_without_recode_loop(AV1_COMP *cpi) {
   aom_clear_system_state();
 
   set_size_independent_vars(cpi);
-
+#if CONFIG_NO_FRAME_CONTEXT_SIGNALING
+  setup_frame_slot_reordering(cpi);
+#endif
   setup_frame_size(cpi);
 
   assert(cm->width == cpi->scaled_source.y_crop_width);
@@ -4593,6 +4609,9 @@ static void encode_with_recode_loop(AV1_COMP *cpi, size_t *size,
 #endif
 
   aom_clear_system_state();
+#if CONFIG_NO_FRAME_CONTEXT_SIGNALING
+  setup_frame_slot_reordering(cpi);
+#endif
   setup_frame_size(cpi);
   set_size_dependent_vars(cpi, &q, &bottom_index, &top_index);
 
@@ -6347,6 +6366,9 @@ int av1_get_compressed_data(AV1_COMP *cpi, unsigned int *frame_flags,
 #else
     av1_rc_get_second_pass_params(cpi);
   } else if (oxcf->pass == 1) {
+#if CONFIG_NO_FRAME_CONTEXT_SIGNALING
+    setup_frame_slot_reordering(cpi);
+#endif
     setup_frame_size(cpi);
   }
 #endif
