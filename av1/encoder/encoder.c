@@ -307,8 +307,8 @@ static BLOCK_SIZE select_sb_size(const AV1_COMP *const cpi) {
 static void setup_frame_slot_reordering(AV1_COMP *cpi) {
   //  printf("setting up frame slot reordering\n");
   AV1_COMMON *const cm = &cpi->common;
-  for (int i = 0; i <= ALTREF_FRAME - LAST_FRAME; i++) {
-    cpi->frame_slot_to_usage[i] = i;
+  for (int i = LAST_FRAME; i <= ALTREF_FRAME; i++) {
+    cpi->frame_slot_to_usage[i - LAST_FRAME] = i;
   }
   if (cpi->refresh_golden_frame) {
     // we may have actually written the golden into the alt slot
@@ -318,11 +318,10 @@ static void setup_frame_slot_reordering(AV1_COMP *cpi) {
       cpi->frame_slot_to_usage[LAST_FRAME - LAST_FRAME] = tmp;
       //}
   }
-  /*
   for (int i = LAST_FRAME; i <= ALTREF_FRAME; i++) {
     printf("frame_slot_to_usage[%d] = %d\n", i - LAST_FRAME, cpi->frame_slot_to_usage[i - LAST_FRAME]);
   }
-  */
+  
 }
 
 static void setup_frame(AV1_COMP *cpi) {
