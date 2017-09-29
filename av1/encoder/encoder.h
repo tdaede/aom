@@ -686,6 +686,7 @@ static INLINE int frame_is_kf_gf_arf(const AV1_COMP *cpi) {
 
 static INLINE int get_ref_frame_map_idx(const AV1_COMP *cpi,
                                         MV_REFERENCE_FRAME ref_frame) {
+  //  printf("get_ref_frame_map_idx\n");
 #if CONFIG_NO_FRAME_CONTEXT_SIGNALING
   // map the physical slot (ref frame passed in) to what it's used for
   ref_frame = cpi->frame_slot_to_usage[ref_frame - LAST_FRAME];
