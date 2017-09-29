@@ -313,8 +313,8 @@ static void setup_frame_slot_reordering(AV1_COMP *cpi) {
   if (cpi->refresh_golden_frame) {
     // we may have actually written the golden into the alt slot
     //if (get_ref_frame_buf_idx(cpi, cpi->alt_fb_idx)) {
-      int tmp = cpi->frame_slot_to_usage[GOLDEN_FRAME - LAST_FRAME];
-      cpi->frame_slot_to_usage[GOLDEN_FRAME - LAST_FRAME] = cpi->frame_slot_to_usage[LAST_FRAME - LAST_FRAME];
+      int tmp = cpi->frame_slot_to_usage[ALTREF_FRAME - LAST_FRAME];
+      cpi->frame_slot_to_usage[ALTREF_FRAME - LAST_FRAME] = cpi->frame_slot_to_usage[LAST_FRAME - LAST_FRAME];
       cpi->frame_slot_to_usage[LAST_FRAME - LAST_FRAME] = tmp;
       //}
   }
