@@ -452,6 +452,8 @@ typedef struct AV1_COMP {
 #endif  // CONFIG_EXT_REFS
   int refresh_alt_ref_frame;
 
+  int last_frame_is_golden_frame;
+
   int ext_refresh_frame_flags_pending;
   int ext_refresh_last_frame;
   int ext_refresh_golden_frame;

@@ -317,6 +317,13 @@ static void setup_frame_slot_reordering(AV1_COMP *cpi) {
       cpi->frame_slot_to_usage[ALTREF_FRAME - LAST_FRAME] = cpi->frame_slot_to_usage[LAST_FRAME - LAST_FRAME];
       cpi->frame_slot_to_usage[LAST_FRAME - LAST_FRAME] = tmp;
       //}
+      cpi->last_frame_is_golden_frame = 1;
+  } else if (cpi->last_frame_is_golden_frame) {
+    // use LAST2_FRAME so that we skip over the golden frame
+    int tmp = cpi->frame_slot_to_usage[LAST2_FRAME - LAST_FRAME];
+    cpi->frame_slot_to_usage[LAST2_FRAME - LAST_FRAME] = cpi->frame_slot_to_usage[LAST_FRAME - LAST_FRAME];
+    cpi->frame_slot_to_usage[LAST_FRAME - LAST_FRAME] = tmp;
+    cpi->last_frame_is_golden_frame = 0;
   }
   for (int i = LAST_FRAME; i <= ALTREF_FRAME; i++) {
     printf("frame_slot_to_usage[%d] = %d\n", i - LAST_FRAME, cpi->frame_slot_to_usage[i - LAST_FRAME]);
