@@ -329,6 +329,8 @@ static void setup_frame_slot_reordering(AV1_COMP *cpi) {
   }
   if (frame_is_intra_only(cm)) {
     cpi->last_frame_is_keyframe = 1;
+  } else {
+    cpi->last_frame_is_keyframe = 0;
   }
   for (int i = LAST_FRAME; i <= ALTREF_FRAME; i++) {
     printf("frame_slot_to_usage[%d] = %d\n", i - LAST_FRAME, cpi->frame_slot_to_usage[i - LAST_FRAME]);
