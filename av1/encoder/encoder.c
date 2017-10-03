@@ -310,7 +310,7 @@ static void setup_frame_slot_reordering(AV1_COMP *cpi) {
   for (int i = LAST_FRAME; i <= ALTREF_FRAME; i++) {
     cpi->frame_slot_to_usage[i - LAST_FRAME] = i;
   }
-  if (cpi->refresh_golden_frame && !cpi->last_frame_is_keyframe) {
+  if (cpi->refresh_golden_frame && !cpi->last_golden_frame_is_keyframe) {
     // load probabilities from previous golden frame rather than last frame,
     // but only if the previous keyframe has inter probs (i.e. not keyframe)
     // we may have actually written the golden into the alt slot
@@ -327,10 +327,8 @@ static void setup_frame_slot_reordering(AV1_COMP *cpi) {
     cpi->frame_slot_to_usage[LAST_FRAME - LAST_FRAME] = tmp;
     cpi->last_frame_is_golden_frame = 0;
   }
-  if (frame_is_intra_only(cm)) {
-    cpi->last_frame_is_keyframe = 1;
-  } else {
-    cpi->last_frame_is_keyframe = 0;
+  if (cpi->refresh_golden_frame) {
+    cpi->last_golden_frame_is_keyframe = frame_is_intra_only(cm);
   }
   for (int i = LAST_FRAME; i <= ALTREF_FRAME; i++) {
     printf("frame_slot_to_usage[%d] = %d\n", i - LAST_FRAME, cpi->frame_slot_to_usage[i - LAST_FRAME]);
