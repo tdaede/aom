@@ -320,12 +320,6 @@ static void setup_frame_slot_reordering(AV1_COMP *cpi) {
       cpi->frame_slot_to_usage[LAST_FRAME - LAST_FRAME] = tmp;
       //}
       cpi->last_frame_is_golden_frame = 1;
-  } else if (cpi->last_frame_is_golden_frame) {
-    // use LAST2_FRAME so that we skip over the golden frame
-    int tmp = cpi->frame_slot_to_usage[LAST2_FRAME - LAST_FRAME];
-    cpi->frame_slot_to_usage[LAST2_FRAME - LAST_FRAME] = cpi->frame_slot_to_usage[LAST_FRAME - LAST_FRAME];
-    cpi->frame_slot_to_usage[LAST_FRAME - LAST_FRAME] = tmp;
-    cpi->last_frame_is_golden_frame = 0;
   }
   if (cpi->refresh_golden_frame) {
     cpi->last_golden_frame_is_keyframe = frame_is_intra_only(cm);
