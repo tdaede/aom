@@ -10597,7 +10597,7 @@ void av1_rd_pick_inter_mode_sb(const AV1_COMP *cpi, TileDataEnc *tile_data,
   }
 
   //  printf("2ref frame skip mask: %x\n", ref_frame_skip_mask[0]);
-#if !CONFIG_NO_FRAME_CONTEXT_SIGNALING
+  //#if !CONFIG_NO_FRAME_CONTEXT_SIGNALING
   // Disable this drop out case if the ref frame
   // segment level feature is enabled for this segment. This is to
   // prevent the possibility that we end up unable to pick any mode.
@@ -10649,7 +10649,7 @@ void av1_rd_pick_inter_mode_sb(const AV1_COMP *cpi, TileDataEnc *tile_data,
 #endif  // CONFIG_EXT_INTER
     }
   }
-#endif // !CONFIG_NO_FRAME_CONTEXT_SIGNALING
+  //#endif // !CONFIG_NO_FRAME_CONTEXT_SIGNALING
   if (cpi->rc.is_src_frame_alt_ref) {
     if (sf->alt_ref_search_fp) {
       assert(cpi->ref_frame_flags & flag_list[ALTREF_FRAME]);
