@@ -10649,7 +10649,7 @@ void av1_rd_pick_inter_mode_sb(const AV1_COMP *cpi, TileDataEnc *tile_data,
 #endif  // CONFIG_EXT_INTER
     }
   }
-
+#endif // !CONFIG_NO_FRAME_CONTEXT_SIGNALING
   if (cpi->rc.is_src_frame_alt_ref) {
     if (sf->alt_ref_search_fp) {
       assert(cpi->ref_frame_flags & flag_list[ALTREF_FRAME]);
@@ -10658,7 +10658,7 @@ void av1_rd_pick_inter_mode_sb(const AV1_COMP *cpi, TileDataEnc *tile_data,
       ref_frame_skip_mask[1] = SECOND_REF_FRAME_MASK;
     }
   }
-#endif // !CONFIG_NO_FRAME_CONTEXT_SIGNALING
+
   if (sf->alt_ref_search_fp)
     if (!cm->show_frame && x->pred_mv_sad[GOLDEN_FRAME] < INT_MAX)
       if (x->pred_mv_sad[ALTREF_FRAME] > (x->pred_mv_sad[GOLDEN_FRAME] << 1))
