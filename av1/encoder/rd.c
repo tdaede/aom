@@ -639,6 +639,7 @@ void av1_fill_token_costs_from_cdf(av1_coeff_cost *cost,
       for (int rt = 0; rt < REF_TYPES; ++rt) {
         for (int band = 0; band < COEF_BANDS; ++band) {
           for (int ctx = 0; ctx < BAND_COEFF_CONTEXTS(band); ++ctx) {
+            printf("tx: %d pt: %d rt: %d band: %d ctx: %d\n", tx, pt, rt, band, ctx);
             av1_cost_tokens_from_cdf(cost[tx][pt][rt][band][ctx],
                                      cdf[tx][pt][rt][band][ctx], NULL);
           }

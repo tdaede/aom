@@ -36,6 +36,9 @@ extern const uint16_t av1_prob_cost[256];
 
 // Calculate the cost of a symbol with probability p15 / 2^15
 static INLINE int av1_cost_symbol(aom_cdf_prob p15) {
+  if (p15 == 0) {
+    printf("p15: %d\n", p15);
+  }
   assert(0 < p15 && p15 < CDF_PROB_TOP);
   const int shift = CDF_PROB_BITS - 1 - get_msb(p15);
   return av1_cost_zero(get_prob(p15 << shift, CDF_PROB_TOP)) +

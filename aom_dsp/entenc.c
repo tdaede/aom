@@ -16,6 +16,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "aom_dsp/entenc.h"
+#include "aom_dsp/prob.h"
 
 /*A range encoder.
   See entdec.c and the references for implementation details \cite{Mar79,MNW98}.
@@ -73,7 +74,7 @@ static void od_ec_enc_normalize(od_ec_enc *enc, od_ec_window low,
       storage = 2 * storage + 2;
       buf = (uint16_t *)realloc(buf, sizeof(*buf) * storage);
       if (buf == NULL) {
-        enc->error = -1;
+                enc->error = -1;
         enc->offs = 0;
         return;
       }
@@ -143,9 +144,9 @@ void od_ec_enc_clear(od_ec_enc *enc) {
 }
 
 /*Encodes a symbol given its frequency in Q15.
-  fl: 32768 minus the cumulative frequency of all symbols that come before the
+  fl: CDF_PROB_TOP minus the cumulative frequency of all symbols that come before the
        one to be encoded.
-  fh: 32768 minus the cumulative frequency of all symbols up to and including
+  fh: CDF_PROB_TOP minus the cumulative frequency of all symbols up to and including
        the one to be encoded.*/
 static void od_ec_encode_q15(od_ec_enc *enc, unsigned fl, unsigned fh) {
   od_ec_window l;
@@ -156,18 +157,18 @@ static void od_ec_encode_q15(od_ec_enc *enc, unsigned fl, unsigned fh) {
   r = enc->rng;
   OD_ASSERT(32768U <= r);
   OD_ASSERT(fh < fl);
-  OD_ASSERT(fl <= 32768U);
+  OD_ASSERT(fl <= CDF_PROB_TOP);
   if (fl < 32768U) {
-    u = (r >> 8) * (uint32_t)fl >> 7;
-    v = (r >> 8) * (uint32_t)fh >> 7;
+    u = (r >> 8) * (uint32_t)fl >> (7 - CDF_SHIFT);
+    v = (r >> 8) * (uint32_t)fh >> (7 - CDF_SHIFT);
     l += r - u;
     r = u - v;
   } else {
-    r -= (r >> 8) * (uint32_t)fh >> 7;
+    r -= (r >> 8) * (uint32_t)fh >> (7 - CDF_SHIFT);
   }
   od_ec_enc_normalize(enc, l, r);
 #if OD_MEASURE_EC_OVERHEAD
-  enc->entropy -= OD_LOG2((double)(OD_ICDF(fh) - OD_ICDF(fl)) / 32768.);
+  enc->entropy -= OD_LOG2((double)(OD_ICDF(fh) - OD_ICDF(fl)) / CDF_PROB_TOP.);
   enc->nb_symbols++;
 #endif
 }
@@ -190,7 +191,7 @@ void od_ec_encode_bool_q15(od_ec_enc *enc, int val, unsigned f) {
   od_ec_enc_normalize(enc, l, r);
 #if OD_MEASURE_EC_OVERHEAD
   enc->entropy -=
-      OD_LOG2((double)(val ? 32768 - OD_ICDF(f) : OD_ICDF(f)) / 32768.);
+      OD_LOG2((double)(val ? f : OD_ICDF(f)) / 32768.);
   enc->nb_symbols++;
 #endif
 }
@@ -208,7 +209,7 @@ void od_ec_encode_cdf_q15(od_ec_enc *enc, int s, const uint16_t *icdf,
   (void)nsyms;
   OD_ASSERT(s >= 0);
   OD_ASSERT(s < nsyms);
-  OD_ASSERT(icdf[nsyms - 1] == OD_ICDF(32768U));
+  OD_ASSERT(icdf[nsyms - 1] == OD_ICDF(CDF_PROB_TOP));
   od_ec_encode_q15(enc, s > 0 ? icdf[s - 1] : OD_ICDF(0), icdf[s]);
 }
 

@@ -188,14 +188,14 @@ int od_ec_decode_cdf_q15(od_ec_dec *dec, const uint16_t *icdf, int nsyms) {
   dif = dec->dif;
   r = dec->rng;
   OD_ASSERT(dif >> (OD_EC_WINDOW_SIZE - 16) < r);
-  OD_ASSERT(icdf[nsyms - 1] == OD_ICDF(32768U));
+  OD_ASSERT(icdf[nsyms - 1] == OD_ICDF(CDF_PROB_TOP));
   OD_ASSERT(32768U <= r);
   c = (unsigned)(dif >> (OD_EC_WINDOW_SIZE - 16));
   v = r;
   ret = -1;
   do {
     u = v;
-    v = (r >> 8) * (uint32_t)icdf[++ret] >> 7;
+    v = (r >> 8) * (uint32_t)icdf[++ret] >> (7 - CDF_SHIFT);
   } while (c < v);
   OD_ASSERT(v < u);
   OD_ASSERT(u <= r);

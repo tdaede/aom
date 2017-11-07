@@ -13,6 +13,7 @@
 #define _entdec_H (1)
 #include <limits.h>
 #include "aom_dsp/entcode.h"
+#include "aom_dsp/prob.h"
 
 #ifdef __cplusplus
 extern "C" {

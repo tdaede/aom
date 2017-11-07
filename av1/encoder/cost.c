@@ -71,6 +71,7 @@ void av1_cost_tokens_from_cdf(int *costs, const aom_cdf_prob *cdf,
   int i;
   aom_cdf_prob prev_cdf = 0;
   for (i = 0;; ++i) {
+    printf("%d,", cdf[i]);
     const aom_cdf_prob p15 = AOM_ICDF(cdf[i]) - prev_cdf;
     prev_cdf = AOM_ICDF(cdf[i]);
 
@@ -82,4 +83,5 @@ void av1_cost_tokens_from_cdf(int *costs, const aom_cdf_prob *cdf,
     // Stop once we reach the end of the CDF
     if (cdf[i] == AOM_ICDF(CDF_PROB_TOP)) break;
   }
+  printf("\n");
 }
