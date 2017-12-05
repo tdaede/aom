@@ -144,6 +144,54 @@ static void set_good_speed_features_framesize_independent(AV1_COMP *cpi,
 #if CONFIG_DUAL_FILTER
     sf->use_fast_interpolation_filter_search = 1;
 #endif  // CONFIG_DUAL_FILTER
+
+// nEW
+    sf->tx_size_search_method = USE_FAST_RD;
+    sf->tx_type_search.fast_intra_tx_type_search = 1;
+    sf->tx_type_search.fast_inter_tx_type_search = 1;
+
+    sf->selective_ref_frame = 2;
+
+    if ((cpi->twopass.fr_content_type == FC_GRAPHICS_ANIMATION) ||
+        av1_internal_image_edge(cpi)) {
+      sf->use_square_partition_only = !frame_is_boosted(cpi);
+    } else {
+      sf->use_square_partition_only = !frame_is_intra_only(cm);
+    }
+    sf->fast_cdef_search = 1;
+
+    sf->less_rectangular_check = 1;
+
+    sf->use_rd_breakout = 1;
+    sf->adaptive_motion_search = 1;
+    sf->mv.auto_mv_step_size = 1;
+    sf->adaptive_rd_thresh = 1;
+    sf->mv.subpel_iters_per_step = 1;
+    sf->mode_skip_start = 10;
+    sf->adaptive_pred_interp_filter = 1;
+
+    sf->recode_loop = ALLOW_RECODE_KFARFGF;
+#if CONFIG_TX64X64
+    sf->intra_y_mode_mask[TX_64X64] = INTRA_DC_H_V;
+#if CONFIG_CFL
+    sf->intra_uv_mode_mask[TX_64X64] = UV_INTRA_DC_H_V_CFL;
+#else
+    sf->intra_uv_mode_mask[TX_64X64] = INTRA_DC_H_V;
+#endif  // CONFIG_CFL
+#endif  // CONFIG_TX64X64
+    sf->intra_y_mode_mask[TX_32X32] = INTRA_DC_H_V;
+#if CONFIG_CFL
+    sf->intra_uv_mode_mask[TX_32X32] = UV_INTRA_DC_H_V_CFL;
+#else
+    sf->intra_uv_mode_mask[TX_32X32] = INTRA_DC_H_V;
+#endif
+    sf->intra_y_mode_mask[TX_16X16] = INTRA_DC_H_V;
+#if CONFIG_CFL
+    sf->intra_uv_mode_mask[TX_16X16] = UV_INTRA_DC_H_V_CFL;
+#else
+    sf->intra_uv_mode_mask[TX_16X16] = INTRA_DC_H_V;
+#endif
+
   }
 
   if (speed >= 2) {
