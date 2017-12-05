@@ -151,25 +151,6 @@ static void set_good_speed_features_framesize_independent(AV1_COMP *cpi,
     sf->tx_type_search.fast_inter_tx_type_search = 1;
 
     sf->selective_ref_frame = 2;
-
-    if ((cpi->twopass.fr_content_type == FC_GRAPHICS_ANIMATION) ||
-        av1_internal_image_edge(cpi)) {
-      sf->use_square_partition_only = !frame_is_boosted(cpi);
-    } else {
-      sf->use_square_partition_only = !frame_is_intra_only(cm);
-    }
-    sf->fast_cdef_search = 1;
-
-    sf->less_rectangular_check = 1;
-
-    sf->use_rd_breakout = 1;
-    sf->adaptive_motion_search = 1;
-    sf->mv.auto_mv_step_size = 1;
-    sf->adaptive_rd_thresh = 1;
-    sf->mv.subpel_iters_per_step = 1;
-    sf->mode_skip_start = 10;
-    sf->adaptive_pred_interp_filter = 1;
-
   }
 
   if (speed >= 2) {
