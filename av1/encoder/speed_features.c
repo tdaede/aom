@@ -146,7 +146,7 @@ static void set_good_speed_features_framesize_independent(AV1_COMP *cpi,
 #endif  // CONFIG_DUAL_FILTER
 
 // nEW
-    sf->selective_ref_frame = 2;
+//sf->selective_ref_frame = 2;
   }
 
   if (speed >= 2) {

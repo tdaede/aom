@@ -4358,7 +4358,8 @@ void av1_encode_frame(AV1_COMP *cpi) {
     cm->frame_offset = cm->current_video_frame;
   }
   av1_setup_frame_buf_refs(cm);
-  if (cpi->sf.selective_ref_frame >= 2) enforce_max_ref_frames(cpi);
+  //if (cpi->sf.selective_ref_frame >= 2) enforce_max_ref_frames(cpi);
+  enforce_max_ref_frames(cpi);
 #if CONFIG_FRAME_SIGN_BIAS
   av1_setup_frame_sign_bias(cm);
 #endif  // CONFIG_FRAME_SIGN_BIAS
