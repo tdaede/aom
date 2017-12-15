@@ -3146,7 +3146,7 @@ void av1_setup_past_independence(AV1_COMMON *cm) {
   if (frame_is_intra_only(cm) && cm->prev_mip && !cm->frame_parallel_decode)
     memset(cm->prev_mip, 0,
            cm->mi_stride * (cm->mi_rows + 1) * sizeof(*cm->prev_mip));
-#if !CONFIG_NO_FRAME_CONTEXT_SIGNALING
+  //#if !CONFIG_NO_FRAME_CONTEXT_SIGNALING
   cm->frame_context_idx = 0;
-#endif  // !CONFIG_NO_FRAME_CONTEXT_SIGNALING
+  //#endif  // !CONFIG_NO_FRAME_CONTEXT_SIGNALING
 }

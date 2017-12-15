@@ -380,7 +380,6 @@ static void setup_frame(AV1_COMP *cpi) {
         break;
       }
     }
-    assert(cm->primary_ref_frame >= 0);
     if (cm->primary_ref_frame < 0) {
       printf("JUST using special sentinel value\n");
       cm->primary_ref_frame = 7;
