@@ -354,7 +354,8 @@ static void setup_frame(AV1_COMP *cpi) {
     */
     const GF_GROUP *gf_group = &cpi->twopass.gf_group;
     if (gf_group->update_type[gf_group->index] == INTNL_ARF_UPDATE)
-      cm->frame_context_idx = EXT_ARF_FRAME;
+      //cm->frame_context_idx = EXT_ARF_FRAME;
+      cm->frame_context_idx = ARF_FRAME;
     else if (cpi->refresh_alt_ref_frame)
       cm->frame_context_idx = ARF_FRAME;
     else if (cpi->rc.is_src_frame_alt_ref)
