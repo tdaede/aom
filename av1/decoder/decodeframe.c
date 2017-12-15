@@ -3520,7 +3520,7 @@ size_t av1_decode_frame_headers_and_setup(AV1Decoder *pbi, const uint8_t *data,
 
   av1_setup_block_planes(xd, cm->subsampling_x, cm->subsampling_y);
 #if CONFIG_NO_FRAME_CONTEXT_SIGNALING
-  if (cm->error_resilient_mode || frame_is_intra_only(cm)) {
+  if (cm->error_resilient_mode || frame_is_intra_only(cm) || cm->primary_ref_frame == 7) {
     // use the default frame context values
     *cm->fc = cm->frame_contexts[FRAME_CONTEXT_DEFAULTS];
     cm->pre_fc = &cm->frame_contexts[FRAME_CONTEXT_DEFAULTS];
@@ -3574,7 +3574,7 @@ static void setup_frame_info(AV1Decoder *pbi) {
     FrameWorkerData *const frame_worker_data = worker->data1;
     if (cm->refresh_frame_context == REFRESH_FRAME_CONTEXT_FORWARD) {
 #if CONFIG_NO_FRAME_CONTEXT_SIGNALING
-      cm->frame_contexts[cm->new_fb_idx] = *cm->fc;
+        cm->frame_contexts[cm->new_fb_idx] = *cm->fc;
 #else
       cm->frame_contexts[cm->frame_context_idx] = *cm->fc;
 #endif  // CONFIG_NO_FRAME_CONTEXT_SIGNALING
@@ -3731,7 +3731,7 @@ void av1_decode_tg_tiles_and_wrapup(AV1Decoder *pbi, const uint8_t *data,
     if (!cm->frame_parallel_decode ||
         cm->refresh_frame_context != REFRESH_FRAME_CONTEXT_FORWARD) {
 #if CONFIG_NO_FRAME_CONTEXT_SIGNALING
-      cm->frame_contexts[cm->new_fb_idx] = *cm->fc;
+        cm->frame_contexts[cm->new_fb_idx] = *cm->fc;
 #else
     if (!cm->error_resilient_mode)
       cm->frame_contexts[cm->frame_context_idx] = *cm->fc;

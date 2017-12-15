@@ -3095,6 +3095,7 @@ void av1_setup_frame_contexts(AV1_COMMON *cm) {
     for (i = 0; i < FRAME_CONTEXTS; ++i) cm->frame_contexts[i] = *cm->fc;
   } else if (cm->reset_frame_context == RESET_FRAME_CONTEXT_CURRENT) {
 #if CONFIG_NO_FRAME_CONTEXT_SIGNALING
+    printf("RESET_FRAME_CONTEXT_CURRENT\n");
     // Reset the frame context of the first specified ref frame.
     if (cm->frame_refs[0].idx >= 0) {
       cm->frame_contexts[cm->frame_refs[cm->primary_ref_frame].idx] = *cm->fc;

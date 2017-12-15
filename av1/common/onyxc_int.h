@@ -449,7 +449,9 @@ typedef struct AV1Common {
 #if !CONFIG_NO_FRAME_CONTEXT_SIGNALING
   unsigned int frame_context_idx; /* Context to use/update */
 #else
-  unsigned int primary_ref_frame;
+  unsigned int frame_context_idx;
+  int fb_of_context_type[8];
+  int primary_ref_frame;
 #endif
   FRAME_COUNTS counts;
 
