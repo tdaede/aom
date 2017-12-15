@@ -1325,6 +1325,7 @@ static aom_codec_err_t encoder_encode(aom_codec_alg_priv_t *ctx,
 #endif
       }
 #endif
+      printf("---------------finished frame\n");
       // Add the frame packet to the list of returned packets.
       aom_codec_cx_pkt_t pkt;
 

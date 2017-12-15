@@ -3771,7 +3771,7 @@ static void update_reference_frames_gf16(AV1_COMP *cpi) {
 
 static void update_reference_frames(AV1_COMP *cpi) {
   AV1_COMMON *const cm = &cpi->common;
-
+  printf("update reference frames\n");
   // NOTE: Save the new show frame buffer index for --test-code=warn, i.e.,
   //       for the purpose to verify no mismatch between encoder and decoder.
   if (cm->show_frame) cpi->last_show_frame_buf_idx = cm->new_fb_idx;

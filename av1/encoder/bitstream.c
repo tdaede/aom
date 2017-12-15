@@ -3642,7 +3642,7 @@ static void write_uncompressed_header_frame(AV1_COMP *cpi,
   if (cm->show_existing_frame) {
     RefCntBuffer *const frame_bufs = cm->buffer_pool->frame_bufs;
     const int frame_to_show = cm->ref_frame_map[cpi->existing_fb_idx_to_show];
-
+    printf("show existing frame %d\n", cpi->existing_fb_idx_to_show);
     if (frame_to_show < 0 || frame_bufs[frame_to_show].ref_count < 1) {
       aom_internal_error(&cm->error, AOM_CODEC_UNSUP_BITSTREAM,
                          "Buffer %d does not contain a reconstructed frame",
