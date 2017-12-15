@@ -354,8 +354,8 @@ static void setup_frame(AV1_COMP *cpi) {
     */
     const GF_GROUP *gf_group = &cpi->twopass.gf_group;
     if (gf_group->update_type[gf_group->index] == INTNL_ARF_UPDATE)
-      //cm->frame_context_idx = EXT_ARF_FRAME;
-      cm->frame_context_idx = ARF_FRAME;
+      cm->frame_context_idx = EXT_ARF_FRAME;
+      //cm->frame_context_idx = ARF_FRAME;
     else if (cpi->refresh_alt_ref_frame)
       cm->frame_context_idx = ARF_FRAME;
     else if (cpi->rc.is_src_frame_alt_ref)
@@ -3823,25 +3823,25 @@ static void update_reference_frames(AV1_COMP *cpi) {
     cpi->arf_map[0] = cpi->alt_fb_idx;
     // TODO(zoeliu): Do we need to copy cpi->interp_filter_selected[0] over to
     // cpi->interp_filter_selected[GOLDEN_FRAME]?
-  } else if (cpi->rc.is_src_frame_ext_arf && cm->show_existing_frame) {
-    // Deal with the special case for showing existing internal ALTREF_FRAME
-    // Refresh the LAST_FRAME with the ALTREF_FRAME and retire the LAST3_FRAME
-    // by updating the virtual indices.
-    const GF_GROUP *const gf_group = &cpi->twopass.gf_group;
-    const int which_arf = gf_group->arf_ref_idx[gf_group->index];
-    assert(gf_group->update_type[gf_group->index] == INTNL_OVERLAY_UPDATE);
+  /* } else if (cpi->rc.is_src_frame_ext_arf && cm->show_existing_frame) { */
+  /*   // Deal with the special case for showing existing internal ALTREF_FRAME */
+  /*   // Refresh the LAST_FRAME with the ALTREF_FRAME and retire the LAST3_FRAME */
+  /*   // by updating the virtual indices. */
+  /*   const GF_GROUP *const gf_group = &cpi->twopass.gf_group; */
+  /*   const int which_arf = gf_group->arf_ref_idx[gf_group->index]; */
+  /*   assert(gf_group->update_type[gf_group->index] == INTNL_OVERLAY_UPDATE); */
 
-    const int tmp = cpi->lst_fb_idxes[LAST_REF_FRAMES - 1];
-    shift_last_ref_frames(cpi);
+  /*   const int tmp = cpi->lst_fb_idxes[LAST_REF_FRAMES - 1]; */
+  /*   shift_last_ref_frames(cpi); */
 
-    cpi->lst_fb_idxes[0] = cpi->alt2_fb_idx;
-    cpi->alt2_fb_idx = tmp;
-    // We need to modify the mapping accordingly
-    cpi->arf_map[which_arf] = cpi->alt2_fb_idx;
+  /*   cpi->lst_fb_idxes[0] = cpi->alt2_fb_idx; */
+  /*   cpi->alt2_fb_idx = tmp; */
+  /*   // We need to modify the mapping accordingly */
+  /*   cpi->arf_map[which_arf] = cpi->alt2_fb_idx; */
 
-    memcpy(cpi->interp_filter_selected[LAST_FRAME],
-           cpi->interp_filter_selected[ALTREF2_FRAME],
-           sizeof(cpi->interp_filter_selected[ALTREF2_FRAME]));
+  /*   memcpy(cpi->interp_filter_selected[LAST_FRAME], */
+  /*          cpi->interp_filter_selected[ALTREF2_FRAME], */
+  /*          sizeof(cpi->interp_filter_selected[ALTREF2_FRAME])); */
   } else { /* For non key/golden frames */
     // === ALTREF_FRAME ===
     if (cpi->refresh_alt_ref_frame) {
