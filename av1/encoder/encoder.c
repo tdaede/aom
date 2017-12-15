@@ -319,6 +319,7 @@ static BLOCK_SIZE select_sb_size(const AV1_COMP *const cpi) {
 
 static void setup_frame(AV1_COMP *cpi) {
   AV1_COMMON *const cm = &cpi->common;
+  printf("setup_frame\n");
   // Set up entropy context depending on frame type. The decoder mandates
   // the use of the default context, index 0, for keyframes and inter
   // frames where the error_resilient_mode or intra_only flag is set. For
@@ -326,11 +327,31 @@ static void setup_frame(AV1_COMP *cpi) {
   // context 1 for ALTREF frames and context 0 for the others.
   if (frame_is_intra_only(cm) || cm->error_resilient_mode) {
     av1_setup_past_independence(cm);
-  } else {
 #if CONFIG_NO_FRAME_CONTEXT_SIGNALING
-// Just use frame context from first signaled reference frame.
-// This will always be LAST_FRAME for now.
+    for (int i = 0; i < 8; i++) {
+      cm->fb_of_context_type[i] = -1;
+    }
+    cm->fb_of_context_type[REGULAR_FRAME] = get_ref_frame_map_idx(cpi, GOLDEN_FRAME);
+    printf("keyframe regular frame fb %d\n", cm->fb_of_context_type[REGULAR_FRAME]);
+#endif
+  } else {
+    /*
+#if CONFIG_NO_FRAME_CONTEXT_SIGNALING
+    const GF_GROUP *gf_group = &cpi->twopass.gf_group;
+    if (gf_group->update_type[gf_group->index] == INTNL_ARF_UPDATE)
+      cm->primary_ref_frame = ALTREF2_FRAME - LAST_FRAME;
+    else if (cpi->refresh_alt_ref_frame)
+      cm->primary_ref_frame = ALTREF_FRAME - LAST_FRAME;
+    else if (cpi->rc.is_src_frame_alt_ref)
+      cm->primary_ref_frame = LAST_FRAME - LAST_FRAME;
+    else if (cpi->refresh_golden_frame)
+      cm->primary_ref_frame = GOLDEN_FRAME - LAST_FRAME;
+    else if (cpi->refresh_bwd_ref_frame)
+      cm->primary_ref_frame = BWDREF_FRAME - LAST_FRAME;
+    else
+      cm->primary_ref_frame = LAST_FRAME - LAST_FRAME;
 #else
+    */
     const GF_GROUP *gf_group = &cpi->twopass.gf_group;
     if (gf_group->update_type[gf_group->index] == INTNL_ARF_UPDATE)
       cm->frame_context_idx = EXT_ARF_FRAME;
@@ -344,7 +365,26 @@ static void setup_frame(AV1_COMP *cpi) {
       cm->frame_context_idx = BRF_FRAME;
     else
       cm->frame_context_idx = REGULAR_FRAME;
+    /*
 #endif  // CONFIG_NO_FRAME_CONTEXT_SIGNALING
+    */
+    #if CONFIG_NO_FRAME_CONTEXT_SIGNALING
+    int wanted_fb = cm->fb_of_context_type[cm->frame_context_idx];
+    printf("looking for fb %d... which has context type %d\n",wanted_fb, cm->frame_context_idx);
+    cm->primary_ref_frame = -1;
+    for (int ref_frame = LAST_FRAME; ref_frame <= ALTREF_FRAME; ref_frame++) {
+      int fb = get_ref_frame_map_idx(cpi, ref_frame);
+      if (fb == wanted_fb) {
+        printf("found ref_frame %d which has fb %d\n", ref_frame, fb);
+        cm->primary_ref_frame = ref_frame - LAST_FRAME;
+        break;
+      }
+    }
+    if (cm->primary_ref_frame < 0) {
+      printf("JUST using special sentinel value\n");
+      cm->primary_ref_frame = 7;
+    }
+    #endif
   }
 
   if (cm->frame_type == KEY_FRAME) {
@@ -358,10 +398,10 @@ static void setup_frame(AV1_COMP *cpi) {
   } else {
 #if CONFIG_NO_FRAME_CONTEXT_SIGNALING
     if (frame_is_intra_only(cm) || cm->error_resilient_mode ||
-        cm->frame_refs[0].idx < 0) {
+        cm->frame_refs[cm->primary_ref_frame].idx < 0 || cm->primary_ref_frame == 7) {
       *cm->fc = cm->frame_contexts[FRAME_CONTEXT_DEFAULTS];
     } else {
-      *cm->fc = cm->frame_contexts[cm->frame_refs[0].idx];
+      *cm->fc = cm->frame_contexts[cm->frame_refs[cm->primary_ref_frame].idx];
     }
 #else
     *cm->fc = cm->frame_contexts[cm->frame_context_idx];
@@ -376,12 +416,12 @@ static void setup_frame(AV1_COMP *cpi) {
 #endif  // !CONFIG_EXT_COMP_REFS
 #if CONFIG_NO_FRAME_CONTEXT_SIGNALING
   if (frame_is_intra_only(cm) || cm->error_resilient_mode ||
-      cm->frame_refs[0].idx < 0) {
+      cm->frame_refs[cm->primary_ref_frame].idx < 0 || cm->primary_ref_frame == 7) {
     // use default frame context values
     cm->pre_fc = &cm->frame_contexts[FRAME_CONTEXT_DEFAULTS];
   } else {
-    *cm->fc = cm->frame_contexts[cm->frame_refs[0].idx];
-    cm->pre_fc = &cm->frame_contexts[cm->frame_refs[0].idx];
+    *cm->fc = cm->frame_contexts[cm->frame_refs[cm->primary_ref_frame].idx];
+    cm->pre_fc = &cm->frame_contexts[cm->frame_refs[cm->primary_ref_frame].idx];
   }
 #else
   cm->pre_fc = &cm->frame_contexts[cm->frame_context_idx];

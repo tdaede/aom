@@ -3050,6 +3050,8 @@ static size_t read_uncompressed_header(AV1Decoder *pbi,
   // This flag will be overridden by the call to av1_setup_past_independence
   // below, forcing the use of context 0 for those frame types.
   cm->frame_context_idx = aom_rb_read_literal(rb, FRAME_CONTEXTS_LOG2);
+#else
+  cm->primary_ref_frame = aom_rb_read_literal(rb, 3);
 #endif
 
   // Generate next_ref_frame_map.
@@ -3518,13 +3520,13 @@ size_t av1_decode_frame_headers_and_setup(AV1Decoder *pbi, const uint8_t *data,
 
   av1_setup_block_planes(xd, cm->subsampling_x, cm->subsampling_y);
 #if CONFIG_NO_FRAME_CONTEXT_SIGNALING
-  if (cm->error_resilient_mode || frame_is_intra_only(cm)) {
+  if (cm->error_resilient_mode || frame_is_intra_only(cm) || cm->primary_ref_frame == 7) {
     // use the default frame context values
     *cm->fc = cm->frame_contexts[FRAME_CONTEXT_DEFAULTS];
     cm->pre_fc = &cm->frame_contexts[FRAME_CONTEXT_DEFAULTS];
   } else {
-    *cm->fc = cm->frame_contexts[cm->frame_refs[0].idx];
-    cm->pre_fc = &cm->frame_contexts[cm->frame_refs[0].idx];
+    *cm->fc = cm->frame_contexts[cm->frame_refs[cm->primary_ref_frame].idx];
+    cm->pre_fc = &cm->frame_contexts[cm->frame_refs[cm->primary_ref_frame].idx];
   }
 #else
   *cm->fc = cm->frame_contexts[cm->frame_context_idx];
@@ -3572,7 +3574,7 @@ static void setup_frame_info(AV1Decoder *pbi) {
     FrameWorkerData *const frame_worker_data = worker->data1;
     if (cm->refresh_frame_context == REFRESH_FRAME_CONTEXT_FORWARD) {
 #if CONFIG_NO_FRAME_CONTEXT_SIGNALING
-      cm->frame_contexts[cm->new_fb_idx] = *cm->fc;
+        cm->frame_contexts[cm->new_fb_idx] = *cm->fc;
 #else
       cm->frame_contexts[cm->frame_context_idx] = *cm->fc;
 #endif  // CONFIG_NO_FRAME_CONTEXT_SIGNALING
@@ -3729,7 +3731,7 @@ void av1_decode_tg_tiles_and_wrapup(AV1Decoder *pbi, const uint8_t *data,
     if (!cm->frame_parallel_decode ||
         cm->refresh_frame_context != REFRESH_FRAME_CONTEXT_FORWARD) {
 #if CONFIG_NO_FRAME_CONTEXT_SIGNALING
-      cm->frame_contexts[cm->new_fb_idx] = *cm->fc;
+        cm->frame_contexts[cm->new_fb_idx] = *cm->fc;
 #else
     if (!cm->error_resilient_mode)
       cm->frame_contexts[cm->frame_context_idx] = *cm->fc;
