@@ -427,6 +427,12 @@ static void setup_frame(AV1_COMP *cpi) {
   cm->pre_fc = &cm->frame_contexts[cm->frame_context_idx];
 #endif  // CONFIG_NO_FRAME_CONTEXT_SIGNALING
 
+  int sum = 0;
+  for (int i = 0; i < sizeof(*cm->pre_fc); i++) {
+    sum += ((uint8_t*)(cm->pre_fc))[i];
+  }
+  printf("pre_fc checksum: %d\n", sum);
+
   cpi->vaq_refresh = 0;
 }
 
