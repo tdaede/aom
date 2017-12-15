@@ -3050,6 +3050,8 @@ static size_t read_uncompressed_header(AV1Decoder *pbi,
   // This flag will be overridden by the call to av1_setup_past_independence
   // below, forcing the use of context 0 for those frame types.
   cm->frame_context_idx = aom_rb_read_literal(rb, FRAME_CONTEXTS_LOG2);
+#else
+  cm->primary_ref_frame = aom_rb_read_literal(rb, 3);
 #endif
 
   // Generate next_ref_frame_map.
@@ -3523,8 +3525,8 @@ size_t av1_decode_frame_headers_and_setup(AV1Decoder *pbi, const uint8_t *data,
     *cm->fc = cm->frame_contexts[FRAME_CONTEXT_DEFAULTS];
     cm->pre_fc = &cm->frame_contexts[FRAME_CONTEXT_DEFAULTS];
   } else {
-    *cm->fc = cm->frame_contexts[cm->frame_refs[0].idx];
-    cm->pre_fc = &cm->frame_contexts[cm->frame_refs[0].idx];
+    *cm->fc = cm->frame_contexts[cm->frame_refs[cm->primary_ref_frame].idx];
+    cm->pre_fc = &cm->frame_contexts[cm->frame_refs[cm->primary_ref_frame].idx];
   }
 #else
   *cm->fc = cm->frame_contexts[cm->frame_context_idx];

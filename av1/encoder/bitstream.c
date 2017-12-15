@@ -3877,6 +3877,8 @@ static void write_uncompressed_header_frame(AV1_COMP *cpi,
   }
 #if !CONFIG_NO_FRAME_CONTEXT_SIGNALING
   aom_wb_write_literal(wb, cm->frame_context_idx, FRAME_CONTEXTS_LOG2);
+#else
+  aom_wb_write_literal(wb, cm->primary_ref_frame, 3);
 #endif
   encode_loopfilter(cm, wb);
   encode_quantization(cm, wb);
