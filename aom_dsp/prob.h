@@ -644,7 +644,7 @@ static INLINE void update_cdf(aom_cdf_prob *cdf, int val, int nsymbs) {
   // 3, 3, 3, 3, 4 };
   // static const int nsymbs2speed[17] = { 0, 0, 1, 1, 2, 2, 2, 2, 2,
   //                                       2, 2, 2, 3, 3, 3, 3, 3 };
-#if CONFIG_CDF_STORAGE_REDUCTION
+#if CDF_PROB_BITS < 15
   static const int nsymbs2speed[17] = { 0, 0, 0, 0, 1, 1, 1, 1, 1,
                                         1, 1, 1, 1, 1, 1, 1, 1 };
   assert(nsymbs < 17);
