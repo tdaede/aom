@@ -644,11 +644,19 @@ static INLINE void update_cdf(aom_cdf_prob *cdf, int val, int nsymbs) {
   // 3, 3, 3, 3, 4 };
   // static const int nsymbs2speed[17] = { 0, 0, 1, 1, 2, 2, 2, 2, 2,
   //                                       2, 2, 2, 3, 3, 3, 3, 3 };
+#if CONFIG_CDF_STORAGE_REDUCTION
+  static const int nsymbs2speed[17] = { 0, 0, 0, 0, 1, 1, 1, 1, 1,
+                                        1, 1, 1, 1, 1, 1, 1, 1 };
+  assert(nsymbs < 17);
+  rate = 2 + (cdf[nsymbs] > 31) +
+    nsymbs2speed[nsymbs];  // + get_msb(nsymbs);
+#else
   static const int nsymbs2speed[17] = { 0, 0, 1, 1, 2, 2, 2, 2, 2,
                                         2, 2, 2, 2, 2, 2, 2, 2 };
   assert(nsymbs < 17);
   rate = 3 + (cdf[nsymbs] > 15) + (cdf[nsymbs] > 31) +
          nsymbs2speed[nsymbs];  // + get_msb(nsymbs);
+#endif
   tmp = AOM_ICDF(0);
   (void)rate2;
   (void)diff;
