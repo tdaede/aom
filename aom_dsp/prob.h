@@ -32,7 +32,7 @@ typedef uint16_t aom_cdf_prob;
 
 #define CDF_SIZE(x) ((x) + 1)
 
-#define CDF_PROB_BITS 14
+#define CDF_PROB_BITS 13
 #define CDF_PROB_TOP (1 << CDF_PROB_BITS)
 #define CDF_INIT_TOP 32768
 #define CDF_SHIFT (15 - CDF_PROB_BITS)
