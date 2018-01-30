@@ -648,7 +648,7 @@ static INLINE void update_cdf(aom_cdf_prob *cdf, int val, int nsymbs) {
   static const int nsymbs2speed[17] = { 0, 0, 1, 1, 2, 2, 2, 2, 2,
     2, 2, 2, 2, 2, 2, 2, 2 };
   assert(nsymbs < 17);
-  rate = 4 + (cdf[nsymbs] > 15) + (cdf[nsymbs] > 31) +
+  rate = 3 + (cdf[nsymbs] > 15) + (cdf[nsymbs] > 31) +
     nsymbs2speed[nsymbs];  // + get_msb(nsymbs);
 #else
   static const int nsymbs2speed[17] = { 0, 0, 1, 1, 2, 2, 2, 2, 2,
