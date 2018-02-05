@@ -77,6 +77,7 @@ extern "C" {
 #endif
 
 /*!\brief Decorator indicating that given struct/union/enum is packed */
+#if 0
 #ifndef ATTRIBUTE_PACKED
 #if defined(__GNUC__) && __GNUC__
 #define ATTRIBUTE_PACKED __attribute__((packed))
@@ -86,6 +87,9 @@ extern "C" {
 #define ATTRIBUTE_PACKED
 #endif
 #endif /* ATTRIBUTE_PACKED */
+#else
+#define ATTRIBUTE_PACKED
+#endif
 
 /*!\brief Current ABI version number
  *
