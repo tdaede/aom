@@ -16,6 +16,9 @@
 #include "av1/common/blockd.h"
 #include "av1/common/onyxc_int.h"
 
+const TX_TYPE *exported_intra_mode_to_tx_type_context =
+    intra_mode_to_tx_type_context;
+
 PREDICTION_MODE av1_left_block_mode(const MODE_INFO *cur_mi,
                                     const MODE_INFO *left_mi, int b) {
   if (b == 0 || b == 2) {

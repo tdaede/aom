@@ -885,6 +885,8 @@ static INLINE BLOCK_SIZE get_subsize(BLOCK_SIZE bsize,
     return subsize_lookup[partition][bsize];
 }
 
+extern const TX_TYPE *exported_intra_mode_to_tx_type_context;
+
 static const TX_TYPE intra_mode_to_tx_type_context[INTRA_MODES] = {
   DCT_DCT,    // DC
   ADST_DCT,   // V
