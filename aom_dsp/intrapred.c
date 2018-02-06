@@ -632,9 +632,8 @@ static INLINE void highbd_d153_predictor(uint16_t *dst, ptrdiff_t stride,
   }
 }
 
-static INLINE void highbd_v_predictor(uint16_t *dst, ptrdiff_t stride, int bw,
-                                      int bh, const uint16_t *above,
-                                      const uint16_t *left, int bd) {
+void highbd_v_predictor(uint16_t *dst, ptrdiff_t stride, int bw, int bh,
+                        const uint16_t *above, const uint16_t *left, int bd) {
   int r;
   (void)left;
   (void)bd;
