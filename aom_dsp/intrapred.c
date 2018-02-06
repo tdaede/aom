@@ -364,7 +364,7 @@ void aom_dc_predictor_64x32_c(uint8_t *dst, ptrdiff_t stride,
 #undef DC_MULTIPLIER_1X2
 #undef DC_MULTIPLIER_1X4
 
-static INLINE void highbd_v_predictor(uint16_t *dst, ptrdiff_t stride, int bw,
+void highbd_v_predictor(uint16_t *dst, ptrdiff_t stride, int bw,
                                       int bh, const uint16_t *above,
                                       const uint16_t *left, int bd) {
   int r;
