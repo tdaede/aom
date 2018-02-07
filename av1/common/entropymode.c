@@ -2591,7 +2591,7 @@ static const aom_cdf_prob
     };
 
 #if CONFIG_SMOOTH_HV
-static const aom_cdf_prob
+const aom_cdf_prob
     default_if_y_mode_cdf[BLOCK_SIZE_GROUPS][CDF_SIZE(INTRA_MODES)] = {
       {
           AOM_ICDF(7168), AOM_ICDF(10680), AOM_ICDF(13913), AOM_ICDF(16928),
@@ -2620,7 +2620,7 @@ static const aom_cdf_prob
     };
 
 #if CONFIG_CFL
-static const aom_cdf_prob
+const aom_cdf_prob
     default_uv_mode_cdf[INTRA_MODES][CDF_SIZE(UV_INTRA_MODES)] = {
       { AOM_ICDF(18377), AOM_ICDF(18815), AOM_ICDF(19743), AOM_ICDF(20178),
         AOM_ICDF(20560), AOM_ICDF(20889), AOM_ICDF(21359), AOM_ICDF(22098),
@@ -2676,7 +2676,7 @@ static const aom_cdf_prob
         AOM_ICDF(28612), AOM_ICDF(32768), 0 },
     };
 #else
-static const aom_cdf_prob
+const aom_cdf_prob
     default_uv_mode_cdf[INTRA_MODES][CDF_SIZE(UV_INTRA_MODES)] = {
       {
           AOM_ICDF(23552), AOM_ICDF(25936), AOM_ICDF(28623), AOM_ICDF(29033),
