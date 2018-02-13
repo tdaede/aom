@@ -13,6 +13,7 @@
 #define _CDEF_BLOCK_H (1)
 
 #include "./odintrin.h"
+#include "av1/common/enums.h"
 
 #define CDEF_BLOCKSIZE 64
 #define CDEF_BLOCKSIZE_LOG2 6
