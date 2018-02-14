@@ -4169,7 +4169,7 @@ static void check_show_existing_frame(AV1_COMP *cpi) {
     cpi->rc.is_last_bipred_frame = 0;
     cm->show_existing_frame = 1;
     cpi->existing_fb_idx_to_show = cpi->lst_fb_idxes[0];
-  } else if (cpi->is_arf_filter_off[which_arf] &&
+  } else if (1 &&
              (next_frame_update_type == OVERLAY_UPDATE ||
               next_frame_update_type == INTNL_OVERLAY_UPDATE)) {
     // Other parameters related to OVERLAY_UPDATE will be taken care of
