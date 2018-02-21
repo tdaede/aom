@@ -49,7 +49,7 @@ typedef struct {
 // The maximum number of extra ALTREF's except ALTREF_FRAME
 // NOTE: REF_FRAMES indicates the maximum number of frames that may be buffered
 //       to serve as references. Currently REF_FRAMES == 8.
-#define USE_GF16_MULTI_LAYER 0
+#define USE_GF16_MULTI_LAYER 1
 
 #if USE_GF16_MULTI_LAYER
 #define MAX_EXT_ARFS (REF_FRAMES - BWDREF_FRAME)

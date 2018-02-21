@@ -318,6 +318,7 @@ static BLOCK_SIZE select_sb_size(const AV1_COMP *const cpi) {
 }
 
 static void setup_frame(AV1_COMP *cpi) {
+  printf("SETUP FRAME\n");
   AV1_COMMON *const cm = &cpi->common;
   // Set up entropy context depending on frame type. The decoder mandates
   // the use of the default context, index 0, for keyframes and inter
@@ -355,19 +356,23 @@ static void setup_frame(AV1_COMP *cpi) {
       cm->frame_context_idx = REGULAR_FRAME;
 #if CONFIG_NO_FRAME_CONTEXT_SIGNALING
     int wanted_fb = cm->fb_of_context_type[cm->frame_context_idx];
+    printf("wanted_fb = %d\n", wanted_fb);
     cm->primary_ref_frame = -1;
     for (int ref_frame = LAST_FRAME; ref_frame <= ALTREF_FRAME; ref_frame++) {
       int fb = get_ref_frame_map_idx(cpi, ref_frame);
       if (fb == wanted_fb) {
+        printf("found ref!\n");
         cm->primary_ref_frame = ref_frame - LAST_FRAME;
-        break;
       }
     }
+    printf("primary_ref_frame = %d\n", cm->primary_ref_frame);
     if (cm->primary_ref_frame < 0) {
       cm->primary_ref_frame = PRIMARY_REF_NONE;
     }
 #endif
   }
+
+  printf("frame_context_idx = %d\n", cm->frame_context_idx);
 
   if (cm->frame_type == KEY_FRAME) {
     cpi->refresh_golden_frame = 1;
@@ -406,7 +411,12 @@ static void setup_frame(AV1_COMP *cpi) {
     cpi->rc.is_bipred_frame = 1;
   }
 #endif  // !CONFIG_EXT_COMP_REFS
-
+  int fc_hash = 0;
+  int i = 0;
+  for (i = 0; i < sizeof(FRAME_CONTEXT); i++) {
+    fc_hash += ((uint8_t*)cm->fc)[i];
+  }
+  printf("frame setup completed with frame context %x\n", fc_hash);
   cpi->vaq_refresh = 0;
 }
 

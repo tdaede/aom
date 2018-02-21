@@ -3763,6 +3763,7 @@ static void write_uncompressed_header_frame(AV1_COMP *cpi,
     }
 #endif
     cpi->refresh_frame_mask = get_refresh_mask(cpi);
+    printf("refresh mask: %x\n", cpi->refresh_frame_mask);
 #if CONFIG_NO_FRAME_CONTEXT_SIGNALING
     int updated_fb = -1;
     for (int i = 0; i < REF_FRAMES; i++) {
@@ -3775,6 +3776,7 @@ static void write_uncompressed_header_frame(AV1_COMP *cpi,
     }
     assert(updated_fb >= 0);
     cm->fb_of_context_type[cm->frame_context_idx] = updated_fb;
+    printf("use fb %d for frame context type %d\n", updated_fb, cm->frame_context_idx);
 #endif
     if (cm->intra_only) {
       write_bitdepth_colorspace_sampling(cm, wb);
@@ -4109,7 +4111,21 @@ static void write_uncompressed_header_obu(AV1_COMP *cpi,
     }
 #endif
     cpi->refresh_frame_mask = get_refresh_mask(cpi);
-
+    printf("refresh mask: %x\n", cpi->refresh_frame_mask);
+#if CONFIG_NO_FRAME_CONTEXT_SIGNALING
+    int updated_fb = -1;
+    for (int i = 0; i < REF_FRAMES; i++) {
+      // If more than one frame is refreshed, it doesn't matter which one
+      // we pick, so pick the first.
+      if (cpi->refresh_frame_mask & (1 << i)) {
+        updated_fb = i;
+        break;
+      }
+    }
+    assert(updated_fb >= 0);
+    cm->fb_of_context_type[cm->frame_context_idx] = updated_fb;
+    printf("use fb %d for frame context type %d\n", updated_fb, cm->frame_context_idx);
+#endif
     if (cm->intra_only) {
       aom_wb_write_literal(wb, cpi->refresh_frame_mask, REF_FRAMES);
 #if CONFIG_FRAME_SIZE
@@ -4134,7 +4150,24 @@ static void write_uncompressed_header_obu(AV1_COMP *cpi,
 #endif
 
     cpi->refresh_frame_mask = get_refresh_mask(cpi);
+    printf("refresh mask: %x\n", cpi->refresh_frame_mask);
+
     aom_wb_write_literal(wb, cpi->refresh_frame_mask, REF_FRAMES);
+
+#if CONFIG_NO_FRAME_CONTEXT_SIGNALING
+    int updated_fb = -1;
+    for (int i = 0; i < REF_FRAMES; i++) {
+      // If more than one frame is refreshed, it doesn't matter which one
+      // we pick, so pick the first.
+      if (cpi->refresh_frame_mask & (1 << i)) {
+        updated_fb = i;
+        break;
+      }
+    }
+    assert(updated_fb >= 0);
+    cm->fb_of_context_type[cm->frame_context_idx] = updated_fb;
+    printf("use fb %d for frame context type %d\n", updated_fb, cm->frame_context_idx);
+#endif
 
     if (!cpi->refresh_frame_mask) {
       // NOTE: "cpi->refresh_frame_mask == 0" indicates that the coded frame
