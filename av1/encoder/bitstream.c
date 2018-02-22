@@ -4101,6 +4101,10 @@ static void write_uncompressed_header_obu(AV1_COMP *cpi,
 #if CONFIG_INTRABC
     if (cm->allow_screen_content_tools) aom_wb_write_bit(wb, cm->allow_intrabc);
 #endif  // CONFIG_INTRABC
+#if CONFIG_NO_FRAME_CONTEXT_SIGNALING
+    // all eight fbs are refreshed, pick one that will live long enough
+    cm->fb_of_context_type[REGULAR_FRAME] = 0;
+#endif
   } else if (cm->frame_type == INTRA_ONLY_FRAME) {
 #if !CONFIG_NO_FRAME_CONTEXT_SIGNALING
     if (!cm->error_resilient_mode) {
