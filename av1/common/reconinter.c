@@ -244,9 +244,6 @@ const wedge_params_type wedge_params_lookup[BLOCK_SIZES_ALL] = {
   { 0, NULL, NULL, 0, NULL },
   { 0, NULL, NULL, 0, NULL },
   { 0, NULL, NULL, 0, NULL },
-  { 0, NULL, NULL, 0, NULL },
-  { 0, NULL, NULL, 0, NULL },
-  { 0, NULL, NULL, 0, NULL },
   { 4, wedge_codebook_16_heqw, wedge_signflip_lookup[BLOCK_8X8], 0,
     wedge_masks[BLOCK_8X8] },
   { 4, wedge_codebook_16_hgtw, wedge_signflip_lookup[BLOCK_8X16], 0,
@@ -2235,7 +2232,6 @@ static const int ii_weights1d[MAX_SB_SIZE] = {
   1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1
 };
 static int ii_size_scales[BLOCK_SIZES_ALL] = {
-    32, 32, 32,
     32, 16, 16, 16, 8, 8, 8, 4,
     4,  4,  2,  2,  2, 1, 1, 1,
     16, 16, 8, 8, 4, 4, 2, 2
@@ -2248,7 +2244,6 @@ static const int ii_weights1d[MAX_SB_SIZE] = {
   2,  2,  2,  2,  2,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1
 };
 static int ii_size_scales[BLOCK_SIZES_ALL] = {
-    16, 16, 16,
     16, 8, 8, 8, 4, 4, 4,
     2,  2, 2, 1, 1, 1,
     8, 8, 4, 4, 2, 2,
