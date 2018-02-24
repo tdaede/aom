@@ -4614,7 +4614,7 @@ static int find_tx_size_rd_records(MACROBLOCK *x, BLOCK_SIZE bsize, int mi_row,
 
 static const uint32_t skip_pred_threshold[3][BLOCK_SIZES_ALL] = {
   {
-      0,  0,  0,  50, 50, 50, 55, 47, 47, 53, 53, 53, 0, 0, 0, 0,
+      50, 50, 50, 55, 47, 47, 53, 53, 53, 0, 0, 0, 0,
 #if CONFIG_EXT_PARTITION
       0,  0,  0,
 #endif
@@ -4624,7 +4624,7 @@ static const uint32_t skip_pred_threshold[3][BLOCK_SIZES_ALL] = {
 #endif
   },
   {
-      0,  0,  0,  69, 69, 69, 67, 68, 68, 53, 53, 53, 0, 0, 0, 0,
+      69, 69, 69, 67, 68, 68, 53, 53, 53, 0, 0, 0, 0,
 #if CONFIG_EXT_PARTITION
       0,  0,  0,
 #endif
@@ -4634,7 +4634,7 @@ static const uint32_t skip_pred_threshold[3][BLOCK_SIZES_ALL] = {
 #endif
   },
   {
-      0,  0,  0,  70, 73, 73, 70, 73, 73, 58, 58, 58, 0, 0, 0, 0,
+      70, 73, 73, 70, 73, 73, 58, 58, 58, 0, 0, 0, 0,
 #if CONFIG_EXT_PARTITION
       0,  0,  0,
 #endif

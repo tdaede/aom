@@ -726,8 +726,7 @@ static const aom_cdf_prob
 
 static const aom_cdf_prob
     default_compound_type_cdf[BLOCK_SIZES_ALL][CDF_SIZE(COMPOUND_TYPES)] = {
-      { AOM_CDF3(16384, 24576) }, { AOM_CDF3(16384, 24576) },
-      { AOM_CDF3(16384, 24576) }, { AOM_CDF3(16384, 24576) },
+      { AOM_CDF3(16384, 24576) },
       { AOM_CDF3(32640, 32704) }, { AOM_CDF3(32640, 32704) },
       { AOM_CDF3(8448, 13293) },  { AOM_CDF3(9216, 12436) },
       { AOM_CDF3(10112, 12679) }, { AOM_CDF3(9088, 10753) },
@@ -763,7 +762,6 @@ static const aom_cdf_prob
 static const aom_cdf_prob
     default_wedge_interintra_cdf[BLOCK_SIZES_ALL][CDF_SIZE(2)] = {
       { AOM_CDF2(128 * 128) }, { AOM_CDF2(128 * 128) }, { AOM_CDF2(128 * 128) },
-      { AOM_CDF2(128 * 128) }, { AOM_CDF2(128 * 128) }, { AOM_CDF2(128 * 128) },
       { AOM_CDF2(194 * 128) }, { AOM_CDF2(213 * 128) }, { AOM_CDF2(217 * 128) },
       { AOM_CDF2(222 * 128) }, { AOM_CDF2(224 * 128) }, { AOM_CDF2(226 * 128) },
       { AOM_CDF2(220 * 128) }, { AOM_CDF2(128 * 128) }, { AOM_CDF2(128 * 128) },
@@ -784,7 +782,7 @@ const aom_tree_index av1_motion_mode_tree[TREE_SIZE(MOTION_MODES)] = {
 
 static const aom_prob
     default_motion_mode_prob[BLOCK_SIZES_ALL][MOTION_MODES - 1] = {
-      { 128, 128 }, { 128, 128 }, { 128, 128 }, { 128, 128 },
+      { 128, 128 },
       { 128, 128 }, { 128, 128 }, { 62, 115 },  { 39, 131 },
       { 39, 132 },  { 118, 94 },  { 77, 125 },  { 100, 121 },
       { 190, 66 },  { 207, 102 }, { 197, 100 }, { 239, 76 },
@@ -799,8 +797,7 @@ static const aom_prob
     };
 static const aom_cdf_prob
     default_motion_mode_cdf[BLOCK_SIZES_ALL][CDF_SIZE(MOTION_MODES)] = {
-      { AOM_CDF3(16384, 24576) }, { AOM_CDF3(16384, 24576) },
-      { AOM_CDF3(16384, 24576) }, { AOM_CDF3(16384, 24576) },
+      { AOM_CDF3(16384, 24576) },
       { AOM_CDF3(16384, 24576) }, { AOM_CDF3(16384, 24576) },
       { AOM_CDF3(7936, 19091) },  { AOM_CDF3(4991, 19205) },
       { AOM_CDF3(4992, 19314) },  { AOM_CDF3(15104, 21590) },
@@ -820,7 +817,6 @@ static const aom_cdf_prob
     };
 
 static const aom_cdf_prob default_obmc_cdf[BLOCK_SIZES_ALL][CDF_SIZE(2)] = {
-  { AOM_CDF2(128 * 128) }, { AOM_CDF2(128 * 128) }, { AOM_CDF2(128 * 128) },
   { AOM_CDF2(128 * 128) }, { AOM_CDF2(128 * 128) }, { AOM_CDF2(128 * 128) },
   { AOM_CDF2(45 * 128) },  { AOM_CDF2(79 * 128) },  { AOM_CDF2(75 * 128) },
   { AOM_CDF2(130 * 128) }, { AOM_CDF2(141 * 128) }, { AOM_CDF2(144 * 128) },

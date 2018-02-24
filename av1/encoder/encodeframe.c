@@ -159,9 +159,6 @@ static const uint8_t num_16x16_blocks_wide_lookup[BLOCK_SIZES_ALL] = {
   1,
   1,
   1,
-  1,
-  1,
-  1,
   2,
   2,
   2,
@@ -176,9 +173,6 @@ static const uint8_t num_16x16_blocks_wide_lookup[BLOCK_SIZES_ALL] = {
   IF_EXT_PARTITION(2, 8)
 };
 static const uint8_t num_16x16_blocks_high_lookup[BLOCK_SIZES_ALL] = {
-  1,
-  1,
-  1,
   1,
   1,
   1,
@@ -2016,7 +2010,6 @@ static void rd_use_partition(AV1_COMP *cpi, ThreadData *td,
 
 /* clang-format off */
 static const BLOCK_SIZE min_partition_size[BLOCK_SIZES_ALL] = {
-  BLOCK_2X2,   BLOCK_2X2,   BLOCK_2X2,    //    2x2,    2x4,     4x2
                             BLOCK_4X4,    //                     4x4
   BLOCK_4X4,   BLOCK_4X4,   BLOCK_4X4,    //    4x8,    8x4,     8x8
   BLOCK_4X4,   BLOCK_4X4,   BLOCK_8X8,    //   8x16,   16x8,   16x16
@@ -2033,7 +2026,6 @@ static const BLOCK_SIZE min_partition_size[BLOCK_SIZES_ALL] = {
 };
 
 static const BLOCK_SIZE max_partition_size[BLOCK_SIZES_ALL] = {
-  BLOCK_4X4,     BLOCK_4X4,       BLOCK_4X4,    //    2x2,    2x4,     4x2
                                   BLOCK_8X8,    //                     4x4
   BLOCK_16X16,   BLOCK_16X16,   BLOCK_16X16,    //    4x8,    8x4,     8x8
   BLOCK_32X32,   BLOCK_32X32,   BLOCK_32X32,    //   8x16,   16x8,   16x16
@@ -2051,7 +2043,6 @@ static const BLOCK_SIZE max_partition_size[BLOCK_SIZES_ALL] = {
 
 // Next square block size less or equal than current block size.
 static const BLOCK_SIZE next_square_size[BLOCK_SIZES_ALL] = {
-  BLOCK_2X2,   BLOCK_2X2,     BLOCK_2X2,    //    2x2,    2x4,     4x2
                               BLOCK_4X4,    //                     4x4
   BLOCK_4X4,   BLOCK_4X4,     BLOCK_8X8,    //    4x8,    8x4,     8x8
   BLOCK_8X8,   BLOCK_8X8,     BLOCK_16X16,  //   8x16,   16x8,   16x16

@@ -860,9 +860,6 @@ static INLINE int get_ext_tx_types(TX_SIZE tx_size, BLOCK_SIZE bs, int is_inter,
 
 static INLINE int is_rect_tx_allowed_bsize(BLOCK_SIZE bsize) {
   static const char LUT[BLOCK_SIZES_ALL] = {
-    0,  // BLOCK_2X2
-    0,  // BLOCK_2X4
-    0,  // BLOCK_4X2
     0,  // BLOCK_4X4
     1,  // BLOCK_4X8
     1,  // BLOCK_8X4
