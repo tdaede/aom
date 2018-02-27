@@ -312,6 +312,20 @@ static BLOCK_SIZE select_sb_size(const AV1_COMP *const cpi) {
 #endif  //  CONFIG_EXT_PARTITION
 }
 
+static int find_ref_frame_with_context(AV1_COMP *const cpi, FRAME_CONTEXT_INDEX frame_context_type) {
+  AV1_COMMON *const cm = &cpi->common;
+  int ref_frame = -1;
+  int wanted_fb = cm->fb_of_context_type[cm->frame_context_idx];
+  for (int ref_frame = LAST_FRAME; ref_frame <= ALTREF_FRAME; ref_frame++) {
+    int fb = get_ref_frame_map_idx(cpi, ref_frame);
+    if (fb == wanted_fb) {
+      ref_frame = ref_frame - LAST_FRAME;
+      break;
+    }
+  }
+  return ref_frame;
+}
+
 static void setup_frame(AV1_COMP *cpi) {
   AV1_COMMON *const cm = &cpi->common;
   // Set up entropy context depending on frame type. The decoder mandates
@@ -349,14 +363,12 @@ static void setup_frame(AV1_COMP *cpi) {
     else
       cm->frame_context_idx = REGULAR_FRAME;
 #if CONFIG_NO_FRAME_CONTEXT_SIGNALING
-    int wanted_fb = cm->fb_of_context_type[cm->frame_context_idx];
-    cm->primary_ref_frame = -1;
-    for (int ref_frame = LAST_FRAME; ref_frame <= ALTREF_FRAME; ref_frame++) {
-      int fb = get_ref_frame_map_idx(cpi, ref_frame);
-      if (fb == wanted_fb) {
-        cm->primary_ref_frame = ref_frame - LAST_FRAME;
-      }
+    cm->primary_ref_frame = find_ref_frame_with_context(cpi, cm->frame_context_idx);
+    // Try other options if the desired frame isn't available.
+    if (cm->primary_ref_frame < 0 && cm->frame_context_idx == OVERLAY_FRAME) {
+      cm->primary_ref_frame = find_ref_frame_with_context(cpi, REGULAR_FRAME);
     }
+    // Worst case, use initial probabilites.
     if (cm->primary_ref_frame < 0) {
       cm->primary_ref_frame = PRIMARY_REF_NONE;
     }
