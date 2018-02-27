@@ -365,7 +365,10 @@ static void setup_frame(AV1_COMP *cpi) {
 #if CONFIG_NO_FRAME_CONTEXT_SIGNALING
     cm->primary_ref_frame = find_ref_frame_with_context(cpi, cm->frame_context_idx);
     // Try other options if the desired frame isn't available.
-    if (cm->primary_ref_frame < 0 && cm->frame_context_idx == OVERLAY_FRAME) {
+    //if (cm->primary_ref_frame < 0 && cm->frame_context_idx == OVERLAY_FRAME) {
+    //  cm->primary_ref_frame = find_ref_frame_with_context(cpi, REGULAR_FRAME);
+    //}
+    if (cm->primary_ref_frame < 0 && cm->frame_context_idx == GLD_FRAME) {
       cm->primary_ref_frame = find_ref_frame_with_context(cpi, REGULAR_FRAME);
     }
     // Worst case, use initial probabilites.
