@@ -1509,6 +1509,8 @@ const coeff_cdf_model default_coef_head_cdf_32x32[PLANE_TYPES] = {
         { AOM_CDF5(3009, 3246, 10158, 10533) } } } }
 };
 
+#endif  // !CONFIG_Q_ADAPT_PROBS
+
 const coeff_cdf_model default_coef_tail_cdf[TX_SIZES][PLANE_TYPES] = {
   { { { { { AOM_ICDF(17389), AOM_ICDF(25062), AOM_ICDF(28688), AOM_ICDF(31459),
             AOM_ICDF(32567), AOM_ICDF(32754), AOM_ICDF(32766), AOM_ICDF(32767),
@@ -3625,9 +3627,8 @@ const coeff_cdf_model default_coef_tail_cdf[TX_SIZES][PLANE_TYPES] = {
 };
 
 /* clang-format on */
-#endif  // !CONFIG_Q_ADAPT_PROBS
 
-static void build_tail_cdfs(aom_cdf_prob cdf_tail[CDF_SIZE(ENTROPY_TOKENS)],
+void build_tail_cdfs(aom_cdf_prob cdf_tail[CDF_SIZE(ENTROPY_TOKENS)],
                             aom_cdf_prob cdf_head[CDF_SIZE(ENTROPY_TOKENS)],
                             int band_zero) {
   int probNZ, prob1, prob_idx, i;
