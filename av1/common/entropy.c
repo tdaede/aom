@@ -514,7 +514,7 @@ const aom_cdf_prob av1_pareto8_tail_probs[COEFF_PROB_MODELS][TAIL_NODES] = {
   { 31486, 1150, 107, 20, 1, 1, 1, 1, 1 },
 };
 
-static void build_tail_cdfs(aom_cdf_prob cdf_tail[CDF_SIZE(ENTROPY_TOKENS)],
+void build_tail_cdfs(aom_cdf_prob cdf_tail[CDF_SIZE(ENTROPY_TOKENS)],
                             aom_cdf_prob cdf_head[CDF_SIZE(ENTROPY_TOKENS)],
                             int band_zero) {
   int probNZ, prob1, prob_idx, i;

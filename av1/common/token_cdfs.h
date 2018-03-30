@@ -4403,7 +4403,7 @@ static const aom_cdf_prob
 #endif  // CONFIG_Q_ADAPT_PROBS
 #else
 /* clang-format off */
-static const coeff_cdf_model
+const coeff_cdf_model
 av1_default_coef_head_cdfs_q0[TX_SIZES][PLANE_TYPES] = {
     {  // TX 4X4
     {  // Y plane
@@ -5183,7 +5183,7 @@ av1_default_coef_head_cdfs_q0[TX_SIZES][PLANE_TYPES] = {
     },
 };
 
-static const coeff_cdf_model
+const coeff_cdf_model
 av1_default_coef_head_cdfs_q1[TX_SIZES][PLANE_TYPES] = {
     {  // TX 4X4
     {  // Y plane
@@ -5963,7 +5963,7 @@ av1_default_coef_head_cdfs_q1[TX_SIZES][PLANE_TYPES] = {
     },
 };
 
-static const coeff_cdf_model
+const coeff_cdf_model
 av1_default_coef_head_cdfs_q2[TX_SIZES][PLANE_TYPES] = {
     {  // TX 4X4
     {  // Y plane
@@ -6743,7 +6743,7 @@ av1_default_coef_head_cdfs_q2[TX_SIZES][PLANE_TYPES] = {
     },
 };
 
-static const coeff_cdf_model
+const coeff_cdf_model
 av1_default_coef_head_cdfs_q3[TX_SIZES][PLANE_TYPES] = {
     {  // TX 4X4
     {  // Y plane
