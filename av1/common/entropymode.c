@@ -1594,7 +1594,7 @@ static const aom_cdf_prob
 #endif  // MAX_TX_DEPTH == 2
     };
 
-static const aom_cdf_prob
+const aom_cdf_prob
     default_if_y_mode_cdf[BLOCK_SIZE_GROUPS][CDF_SIZE(INTRA_MODES)] = {
       { AOM_CDF13(7168, 10680, 13913, 16928, 20294, 22790, 24706, 26275, 28139,
                   29751, 30563, 31468) },
