@@ -1016,7 +1016,7 @@ const aom_tree_index av1_compound_type_tree[TREE_SIZE(COMPOUND_TYPES)] = {
 #endif  // CONFIG_JNT_COMP
 /* clang-format on */
 
-static const aom_cdf_prob default_intra_inter_cdf[INTRA_INTER_CONTEXTS]
+const aom_cdf_prob default_intra_inter_cdf[INTRA_INTER_CONTEXTS]
                                                  [CDF_SIZE(2)] = {
                                                    { AOM_CDF2(768) },
                                                    { AOM_CDF2(12416) },
