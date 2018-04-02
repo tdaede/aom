@@ -570,7 +570,7 @@ static const aom_cdf_prob default_obmc_cdf[BLOCK_SIZES_ALL][CDF_SIZE(2)] = {
   { AOM_CDF2(26879) }
 };
 
-static const aom_cdf_prob default_intra_inter_cdf[INTRA_INTER_CONTEXTS]
+const aom_cdf_prob default_intra_inter_cdf[INTRA_INTER_CONTEXTS]
                                                  [CDF_SIZE(2)] = {
                                                    { AOM_CDF2(806) },
                                                    { AOM_CDF2(16662) },
