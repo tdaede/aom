@@ -1074,7 +1074,7 @@ static const aom_cdf_prob default_delta_lf_cdf[CDF_SIZE(DELTA_LF_PROBS + 1)] = {
 };
 #endif
 
-static const aom_cdf_prob default_intra_inter_cdf[INTRA_INTER_CONTEXTS]
+const aom_cdf_prob default_intra_inter_cdf[INTRA_INTER_CONTEXTS]
                                                  [CDF_SIZE(2)] = {
                                                    { AOM_CDF2(768) },
                                                    { AOM_CDF2(12416) },
