@@ -35,7 +35,9 @@ extern "C" {
 #define AOM_IMG_FMT_HAS_ALPHA 0x400    /**< Image has an alpha channel. */
 #define AOM_IMG_FMT_HIGHBITDEPTH 0x800 /**< Image uses 16bit framebuffer. */
 
-#include "./aom_config.h"
+#ifndef CONFIG_CICP
+#define CONFIG_CICP 0
+#endif
 
 /*!\brief List of supported image formats */
 typedef enum aom_img_fmt {
