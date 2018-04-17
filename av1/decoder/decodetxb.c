@@ -528,6 +528,9 @@ uint8_t av1_read_coeffs_txb_facade(const AV1_COMMON *const cm,
   TXB_CTX txb_ctx;
   get_txb_ctx(plane_bsize, tx_size, plane, pd->above_context + col,
               pd->left_context + row, &txb_ctx);
+
+  txb_ctx.txb_skip_ctx = 0;
+
   uint8_t cul_level =
       av1_read_coeffs_txb(cm, xd, r, row, col, plane,
 #if CONFIG_NEW_QUANT
