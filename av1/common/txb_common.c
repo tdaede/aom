@@ -229,8 +229,8 @@ void av1_init_txb_probs(FRAME_CONTEXT *fc) {
   for (tx_size = 0; tx_size < TX_SIZES; ++tx_size) {
     for (ctx = 0; ctx < TXB_SKIP_CONTEXTS; ++ctx) {
       fc->txb_skip_cdf[tx_size][ctx][0] =
-          AOM_ICDF(128 * (aom_cdf_prob)fc->txb_skip[tx_size][ctx]);
-      fc->txb_skip_cdf[tx_size][ctx][1] = AOM_ICDF(32768);
+          AOM_ICDF(20000);
+      fc->txb_skip_cdf[tx_size][ctx][1] = 0;
       fc->txb_skip_cdf[tx_size][ctx][2] = 0;
     }
   }
