@@ -149,6 +149,10 @@ static INLINE int daala_read_symbol(daala_reader *r, const aom_cdf_prob *cdf,
   return symb;
 }
 
+typedef struct daala_reader aom_reader;
+
+int aom_read_symbol_for_rav1e(aom_reader *r, aom_cdf_prob *cdf, int nsymbs);
+
 #ifdef __cplusplus
 }  // extern "C"
 #endif
