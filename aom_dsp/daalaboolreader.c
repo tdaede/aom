@@ -35,3 +35,12 @@ uint32_t aom_daala_reader_tell(const daala_reader *r) {
 uint32_t aom_daala_reader_tell_frac(const daala_reader *r) {
   return od_ec_dec_tell_frac(&r->ec);
 }
+
+typedef struct daala_reader aom_reader;
+
+int aom_read_symbol_for_rav1e(aom_reader *r, aom_cdf_prob *cdf, int nsymbs) {
+  int ret;
+  ret = daala_read_symbol(r, cdf, nsymbs );
+  if (r->allow_update_cdf) update_cdf(cdf, ret, nsymbs);
+  return ret;
+}
