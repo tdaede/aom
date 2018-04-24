@@ -733,7 +733,7 @@ const aom_cdf_prob
                   22064, 22820, 24290) },
     };
 
-static const aom_cdf_prob
+const aom_cdf_prob
 #if CONFIG_CFL
     default_uv_mode_cdf[CFL_ALLOWED_TYPES][INTRA_MODES][CDF_SIZE(
         UV_INTRA_MODES)] = {
