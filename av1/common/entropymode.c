@@ -1251,7 +1251,7 @@ const aom_cdf_prob
 #endif  // CONFIG_FILTER_INTRA
 
 #if CONFIG_EXT_INTRA_MOD
-static const aom_cdf_prob default_angle_delta_cdf[DIRECTIONAL_MODES][CDF_SIZE(
+const aom_cdf_prob default_angle_delta_cdf[DIRECTIONAL_MODES][CDF_SIZE(
     2 * MAX_ANGLE_DELTA + 1)] = {
   { AOM_CDF7(2340, 5327, 7611, 23102, 27196, 30546) },
   { AOM_CDF7(3267, 8071, 11970, 21822, 25619, 30034) },
