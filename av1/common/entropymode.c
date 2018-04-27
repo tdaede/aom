@@ -21,7 +21,7 @@
 
 #if CONFIG_LV_MAP
 #include "av1/common/txb_common.h"
-static const aom_cdf_prob default_txb_skip_cdf[TX_SIZES][TXB_SKIP_CONTEXTS]
+const aom_cdf_prob default_txb_skip_cdf[TX_SIZES][TXB_SKIP_CONTEXTS]
                                               [CDF_SIZE(2)] = {
                                                 {
                                                     { AOM_CDF2(128 * 255) },
@@ -106,7 +106,7 @@ static const aom_cdf_prob default_txb_skip_cdf[TX_SIZES][TXB_SKIP_CONTEXTS]
 #endif
                                               };
 
-static const aom_cdf_prob default_dc_sign_cdf[PLANE_TYPES][DC_SIGN_CONTEXTS]
+const aom_cdf_prob default_dc_sign_cdf[PLANE_TYPES][DC_SIGN_CONTEXTS]
                                              [CDF_SIZE(2)] = {
                                                {
                                                    { AOM_CDF2(128 * 125) },
@@ -120,42 +120,42 @@ static const aom_cdf_prob default_dc_sign_cdf[PLANE_TYPES][DC_SIGN_CONTEXTS]
                                                },
                                              };
 
-static const aom_cdf_prob default_eob_multi16[PLANE_TYPES][2][CDF_SIZE(5)] = {
+const aom_cdf_prob default_eob_multi16[PLANE_TYPES][2][CDF_SIZE(5)] = {
   { { AOM_CDF5(11070, 14028, 19190, 25681) },
     { AOM_CDF5(3385, 5466, 8797, 17499) } },
   { { AOM_CDF5(16053, 18992, 24073, 29172) },
     { AOM_CDF5(6554, 13107, 19661, 26214) } }
 };
 
-static const aom_cdf_prob default_eob_multi32[PLANE_TYPES][2][CDF_SIZE(6)] = {
+const aom_cdf_prob default_eob_multi32[PLANE_TYPES][2][CDF_SIZE(6)] = {
   { { AOM_CDF6(3593, 4657, 6587, 9956, 17920) },
     { AOM_CDF6(876, 1385, 3472, 6857, 13870) } },
   { { AOM_CDF6(15524, 17691, 20904, 25082, 30263) },
     { AOM_CDF6(5461, 10923, 16384, 21845, 27307) } }
 };
 
-static const aom_cdf_prob default_eob_multi64[PLANE_TYPES][2][CDF_SIZE(7)] = {
+const aom_cdf_prob default_eob_multi64[PLANE_TYPES][2][CDF_SIZE(7)] = {
   { { AOM_CDF7(8446, 10052, 12712, 15920, 19942, 25110) },
     { AOM_CDF7(2970, 4203, 6290, 9040, 13519, 20938) } },
   { { AOM_CDF7(19771, 21583, 24153, 26766, 29217, 31560) },
     { AOM_CDF7(4681, 9362, 14043, 18725, 23406, 28087) } }
 };
 
-static const aom_cdf_prob default_eob_multi128[PLANE_TYPES][2][CDF_SIZE(8)] = {
+const aom_cdf_prob default_eob_multi128[PLANE_TYPES][2][CDF_SIZE(8)] = {
   { { AOM_CDF8(4562, 5578, 7411, 9502, 12670, 17243, 23467) },
     { AOM_CDF8(940, 1670, 3326, 9541, 16036, 21103, 26146) } },
   { { AOM_CDF8(21536, 22942, 25165, 27067, 29045, 30824, 32112) },
     { AOM_CDF8(4096, 8192, 12288, 16384, 20480, 24576, 28672) } }
 };
 
-static const aom_cdf_prob default_eob_multi256[PLANE_TYPES][2][CDF_SIZE(9)] = {
+const aom_cdf_prob default_eob_multi256[PLANE_TYPES][2][CDF_SIZE(9)] = {
   { { AOM_CDF9(7093, 8715, 11204, 14326, 18248, 22182, 25706, 28845) },
     { AOM_CDF9(3641, 7282, 10923, 14564, 18204, 21845, 25486, 29127) } },
   { { AOM_CDF9(21080, 22437, 24396, 26528, 28519, 29980, 31092, 32088) },
     { AOM_CDF9(3641, 7282, 10923, 14564, 18204, 21845, 25486, 29127) } }
 };
 
-static const aom_cdf_prob default_eob_multi512[PLANE_TYPES][2][CDF_SIZE(10)] = {
+const aom_cdf_prob default_eob_multi512[PLANE_TYPES][2][CDF_SIZE(10)] = {
   { { AOM_CDF10(5050, 6030, 8263, 10721, 14291, 18057, 22390, 26207, 28963) },
     { AOM_CDF10(3277, 6554, 9830, 13107, 16384, 19661, 22938, 26214, 29491) } },
   { { AOM_CDF10(21229, 22805, 25590, 27709, 29526, 30696, 31448, 32055,
@@ -163,7 +163,7 @@ static const aom_cdf_prob default_eob_multi512[PLANE_TYPES][2][CDF_SIZE(10)] = {
     { AOM_CDF10(3277, 6554, 9830, 13107, 16384, 19661, 22938, 26214, 29491) } }
 };
 
-static const aom_cdf_prob default_eob_multi1024[PLANE_TYPES][2][CDF_SIZE(11)] =
+const aom_cdf_prob default_eob_multi1024[PLANE_TYPES][2][CDF_SIZE(11)] =
     { { { AOM_CDF11(6028, 7445, 10558, 13479, 16814, 20418, 23777, 26301, 28478,
                     30332) },
         { AOM_CDF11(2979, 5958, 8937, 11916, 14895, 17873, 20852, 23831, 26810,
@@ -173,7 +173,7 @@ static const aom_cdf_prob default_eob_multi1024[PLANE_TYPES][2][CDF_SIZE(11)] =
         { AOM_CDF11(2979, 5958, 8937, 11916, 14895, 17873, 20852, 23831, 26810,
                     29789) } } };
 
-static const aom_cdf_prob
+const aom_cdf_prob
     default_coeff_base_multi[TX_SIZES][PLANE_TYPES][SIG_COEF_CONTEXTS]
                             [CDF_SIZE(NUM_BASE_LEVELS + 2)] = {
                               { { { AOM_CDF4(7183, 17717, 24002) },
@@ -600,7 +600,7 @@ static const aom_cdf_prob
 #endif
                             };
 
-static const aom_cdf_prob
+const aom_cdf_prob
     default_coeff_base_eob_multi[TX_SIZES][PLANE_TYPES][SIG_COEF_CONTEXTS_EOB]
                                 [CDF_SIZE(NUM_BASE_LEVELS + 1)] = {
                                   { { { AOM_CDF3(26406, 31407) },
@@ -647,7 +647,7 @@ static const aom_cdf_prob
 #endif
                                 };
 
-static const aom_cdf_prob
+const aom_cdf_prob
     default_eob_extra_cdf[TX_SIZES][PLANE_TYPES][EOB_COEF_CONTEXTS][CDF_SIZE(
         2)] = {
       {
@@ -797,7 +797,7 @@ static const aom_cdf_prob
 #endif
     };
 
-static const aom_cdf_prob
+const aom_cdf_prob
     default_coeff_lps_multi[TX_SIZES][PLANE_TYPES][LEVEL_CONTEXTS][CDF_SIZE(
         BR_CDF_SIZE)] = {
       { { { AOM_CDF4(21416, 28070, 30521) }, { AOM_CDF4(15981, 23864, 27832) },
