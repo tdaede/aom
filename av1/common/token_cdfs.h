@@ -12,7 +12,7 @@
 #include "./aom_config.h"
 #include "av1/common/entropy.h"
 
-static const aom_cdf_prob
+const aom_cdf_prob
     av1_default_dc_sign_cdfs[TOKEN_CDF_Q_CTXS][PLANE_TYPES][DC_SIGN_CONTEXTS]
                             [CDF_SIZE(2)] = {
                               { {
@@ -57,7 +57,7 @@ static const aom_cdf_prob
                                 } },
                             };
 
-static const aom_cdf_prob
+const aom_cdf_prob
     av1_default_txb_skip_cdfs[TOKEN_CDF_Q_CTXS][TX_SIZES][TXB_SKIP_CONTEXTS]
                              [CDF_SIZE(2)] = { { { { AOM_CDF2(31849) },
                                                    { AOM_CDF2(5892) },
@@ -643,7 +643,7 @@ static const aom_cdf_prob av1_default_eob_extra_cdfs
                 { AOM_CDF2(16384) }, { AOM_CDF2(16384) }, { AOM_CDF2(16384) },
                 { AOM_CDF2(16384) } } } } };
 
-static const aom_cdf_prob
+const aom_cdf_prob
     av1_default_eob_multi16_cdfs[TOKEN_CDF_Q_CTXS][PLANE_TYPES][2][CDF_SIZE(
         5)] = { { { { AOM_CDF5(840, 1039, 1980, 4895) },
                     { AOM_CDF5(370, 671, 1883, 4471) } },
@@ -662,7 +662,7 @@ static const aom_cdf_prob
                   { { AOM_CDF5(19575, 21766, 26044, 29709) },
                     { AOM_CDF5(7297, 10767, 19273, 28194) } } } };
 
-static const aom_cdf_prob
+const aom_cdf_prob
     av1_default_eob_multi32_cdfs[TOKEN_CDF_Q_CTXS][PLANE_TYPES][2][CDF_SIZE(
         6)] = { { { { AOM_CDF6(400, 520, 977, 2102, 6542) },
                     { AOM_CDF6(210, 405, 1315, 3326, 7537) } },
@@ -681,7 +681,7 @@ static const aom_cdf_prob
                   { { AOM_CDF6(22086, 24282, 27010, 29770, 31743) },
                     { AOM_CDF6(7699, 10897, 20891, 26926, 31628) } } } };
 
-static const aom_cdf_prob
+const aom_cdf_prob
     av1_default_eob_multi64_cdfs[TOKEN_CDF_Q_CTXS][PLANE_TYPES][2][CDF_SIZE(
         7)] = { { { { AOM_CDF7(329, 498, 1101, 1784, 3265, 7758) },
                     { AOM_CDF7(335, 730, 1459, 5494, 8755, 12997) } },
@@ -700,7 +700,7 @@ static const aom_cdf_prob
                   { { AOM_CDF7(24212, 25708, 28268, 30035, 31307, 32049) },
                     { AOM_CDF7(8726, 12378, 19409, 26450, 30038, 32462) } } } };
 
-static const aom_cdf_prob
+const aom_cdf_prob
     av1_default_eob_multi128_cdfs[TOKEN_CDF_Q_CTXS][PLANE_TYPES][2][CDF_SIZE(
         8)] = {
       { { { AOM_CDF8(219, 482, 1140, 2091, 3680, 6028, 12586) },
@@ -721,7 +721,7 @@ static const aom_cdf_prob
           { AOM_CDF8(9165, 13282, 21150, 30286, 31894, 32571, 32712) } } }
     };
 
-static const aom_cdf_prob
+const aom_cdf_prob
     av1_default_eob_multi256_cdfs[TOKEN_CDF_Q_CTXS][PLANE_TYPES][2][CDF_SIZE(
         9)] = {
       { { { AOM_CDF9(310, 584, 1887, 3589, 6168, 8611, 11352, 15652) },
@@ -744,7 +744,7 @@ static const aom_cdf_prob
                      32695) } } }
     };
 
-static const aom_cdf_prob
+const aom_cdf_prob
     av1_default_eob_multi512_cdfs[TOKEN_CDF_Q_CTXS][PLANE_TYPES][2][CDF_SIZE(
         10)] = { { { { AOM_CDF10(641, 983, 3707, 5430, 10234, 14958, 18788,
                                  23412, 26061) },
@@ -779,7 +779,7 @@ static const aom_cdf_prob
                      { AOM_CDF10(3277, 6554, 9830, 13107, 16384, 19661, 22938,
                                  26214, 29491) } } } };
 
-static const aom_cdf_prob
+const aom_cdf_prob
     av1_default_eob_multi1024_cdfs[TOKEN_CDF_Q_CTXS][PLANE_TYPES][2][CDF_SIZE(
         11)] = { { { { AOM_CDF11(393, 421, 751, 1623, 3160, 6352, 13345, 18047,
                                  22571, 25830) },
@@ -814,7 +814,7 @@ static const aom_cdf_prob
                      { AOM_CDF11(2979, 5958, 8937, 11916, 14895, 17873, 20852,
                                  23831, 26810, 29789) } } } };
 
-static const aom_cdf_prob av1_default_coeff_lps_multi_cdfs
+const aom_cdf_prob av1_default_coeff_lps_multi_cdfs
     [TOKEN_CDF_Q_CTXS][TX_SIZES][PLANE_TYPES][LEVEL_CONTEXTS]
     [CDF_SIZE(BR_CDF_SIZE)] = {
       { { { { AOM_CDF4(14298, 20718, 24174) },
@@ -1579,7 +1579,7 @@ static const aom_cdf_prob av1_default_coeff_lps_multi_cdfs
             { AOM_CDF4(8192, 16384, 24576) } } } }
     };
 
-static const aom_cdf_prob av1_default_coeff_base_multi_cdfs
+const aom_cdf_prob av1_default_coeff_base_multi_cdfs
     [TOKEN_CDF_Q_CTXS][TX_SIZES][PLANE_TYPES][SIG_COEF_CONTEXTS]
     [CDF_SIZE(NUM_BASE_LEVELS + 2)] =
         { { { { { AOM_CDF4(4034, 8930, 12727) },
@@ -3263,7 +3263,7 @@ static const aom_cdf_prob av1_default_coeff_base_multi_cdfs
                 { AOM_CDF4(8192, 16384, 24576) },
                 { AOM_CDF4(8192, 16384, 24576) } } } } };
 
-static const aom_cdf_prob av1_default_coeff_base_eob_multi_cdfs
+const aom_cdf_prob av1_default_coeff_base_eob_multi_cdfs
     [TOKEN_CDF_Q_CTXS][TX_SIZES][PLANE_TYPES][SIG_COEF_CONTEXTS_EOB][CDF_SIZE(
         NUM_BASE_LEVELS + 1)] = { { { { { AOM_CDF3(17837, 29055) },
                                         { AOM_CDF3(29600, 31446) },
