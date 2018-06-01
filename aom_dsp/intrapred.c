@@ -61,7 +61,7 @@ static INLINE uint16_t paeth_predictor_single(uint16_t left, uint16_t top,
              : (p_top <= p_top_left) ? top : top_left;
 }
 
-static INLINE void paeth_predictor(uint8_t *dst, ptrdiff_t stride, int bw,
+void paeth_predictor(uint8_t *dst, ptrdiff_t stride, int bw,
                                    int bh, const uint8_t *above,
                                    const uint8_t *left) {
   int r, c;
