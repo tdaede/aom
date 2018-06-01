@@ -195,7 +195,7 @@ static INLINE uint16_t paeth_predictor_single(uint16_t left, uint16_t top,
              : (p_top <= p_top_left) ? top : top_left;
 }
 
-void paeth_predictor(uint8_t *dst, ptrdiff_t stride, int bw,
+static INLINE void paeth_predictor(uint8_t *dst, ptrdiff_t stride, int bw,
                                    int bh, const uint8_t *above,
                                    const uint8_t *left) {
   int r, c;
@@ -838,7 +838,7 @@ void aom_highbd_d153_predictor_2x2_c(uint16_t *dst, ptrdiff_t stride,
   DST(1, 1) = AVG3(J, I, X);
 }
 
-static INLINE void highbd_paeth_predictor(uint16_t *dst, ptrdiff_t stride,
+void highbd_paeth_predictor(uint16_t *dst, ptrdiff_t stride,
                                           int bw, int bh, const uint16_t *above,
                                           const uint16_t *left, int bd) {
   int r, c;
