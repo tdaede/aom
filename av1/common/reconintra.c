@@ -1909,7 +1909,7 @@ static void build_intra_predictors(const MACROBLOCKD *xd, const uint8_t *ref,
   assert(n_bottomleft_px >= 0);
 
   if ((!need_above && n_left_px == 0) || (!need_left && n_top_px == 0)) {
-#if CONFIG_INTRA_EDGE
+#if 0//CONFIG_INTRA_EDGE
     int val;
     if (need_left) {
       val = (n_top_px > 0) ? above_ref[0] : 129;
@@ -1945,13 +1945,13 @@ static void build_intra_predictors(const MACROBLOCKD *xd, const uint8_t *ref,
       if (i < num_left_pixels_needed)
         memset(&left_col[i], left_col[i - 1], num_left_pixels_needed - i);
     } else {
-#if CONFIG_INTRA_EDGE
+#if 0//CONFIG_INTRA_EDGE
       if (n_top_px > 0) {
         memset(left_col, above_ref[0], num_left_pixels_needed);
       } else {
 #endif  // CONFIG_INTRA_EDGE
         memset(left_col, 129, num_left_pixels_needed);
-#if CONFIG_INTRA_EDGE
+#if 0//CONFIG_INTRA_EDGE
       }
 #endif  // CONFIG_INTRA_EDGE
     }
@@ -1976,20 +1976,20 @@ static void build_intra_predictors(const MACROBLOCKD *xd, const uint8_t *ref,
       if (i < num_top_pixels_needed)
         memset(&above_row[i], above_row[i - 1], num_top_pixels_needed - i);
     } else {
-#if CONFIG_INTRA_EDGE
+#if 0//CONFIG_INTRA_EDGE
       if (n_left_px > 0) {
         memset(above_row, left_ref[0], num_top_pixels_needed);
       } else {
 #endif  // CONFIG_INTRA_EDGE
         memset(above_row, 127, num_top_pixels_needed);
-#if CONFIG_INTRA_EDGE
+#if 0//CONFIG_INTRA_EDGE
       }
 #endif  // CONFIG_INTRA_EDGE
     }
   }
 
   if (need_above_left) {
-#if CONFIG_INTRA_EDGE
+#if 0//CONFIG_INTRA_EDGE
     if (n_top_px > 0 && n_left_px > 0) {
       above_row[-1] = above_ref[-1];
     } else if (n_top_px > 0) {
