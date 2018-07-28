@@ -281,7 +281,7 @@ typedef enum {
   SHARP_SHARP,
 } DUAL_FILTER_TYPE;
 
-typedef enum ATTRIBUTE_PACKED {
+typedef enum {
   // DCT only
   EXT_TX_SET_DCTONLY,
   // DCT + Identity only
