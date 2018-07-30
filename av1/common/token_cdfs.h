@@ -320,7 +320,7 @@ const aom_cdf_prob
                                                    { AOM_CDF2(16384) },
                                                    { AOM_CDF2(16384) } } } };
 
-static const aom_cdf_prob av1_default_eob_extra_cdfs
+const aom_cdf_prob av1_default_eob_extra_cdfs
     [TOKEN_CDF_Q_CTXS][TX_SIZES][PLANE_TYPES][EOB_COEF_CONTEXTS][CDF_SIZE(2)] =
         { { { { { AOM_CDF2(16384) }, { AOM_CDF2(16384) }, { AOM_CDF2(16384) },
                 { AOM_CDF2(16961) }, { AOM_CDF2(17223) }, { AOM_CDF2(7621) },
