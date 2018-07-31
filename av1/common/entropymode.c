@@ -17,7 +17,7 @@
 #include "av1/common/seg_common.h"
 #include "av1/common/txb_common.h"
 
-static const aom_cdf_prob
+const aom_cdf_prob
     default_kf_y_mode_cdf[KF_MODE_CONTEXTS][KF_MODE_CONTEXTS][CDF_SIZE(
         INTRA_MODES)] = {
       { { AOM_CDF13(15588, 17027, 19338, 20218, 20682, 21110, 21825, 23244,
