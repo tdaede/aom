@@ -549,7 +549,7 @@ static int set_layer_pattern(int layering_mode, int superframe_cnt,
 }
 
 int main(int argc, char **argv) {
-  AvxVideoWriter *outfile[AOM_MAX_LAYERS] = { NULL };
+  FILE* outfile[AOM_MAX_LAYERS] = { NULL };
   aom_codec_ctx_t codec;
   aom_codec_enc_cfg_t cfg;
   int frame_cnt = 0;
@@ -729,7 +729,8 @@ int main(int argc, char **argv) {
       info.time_base.denominator = cfg.g_timebase.den;
 
       snprintf(file_name, sizeof(file_name), "%s_%d.av1", argv[2], i);
-      outfile[i] = aom_video_writer_open(file_name, kContainerIVF, &info);
+      //      outfile[i] = aom_video_writer_open(file_name, kContainerOBU, &info);
+      outfile[i] = fopen(file_name, "w");
       if (!outfile[i]) die("Failed to open %s for writing", file_name);
       assert(outfile[i] != NULL);
     }
@@ -831,8 +832,10 @@ int main(int argc, char **argv) {
               for (unsigned tl = layer_id.temporal_layer_id;
                    tl < ts_number_layers; ++tl) {
                 unsigned int j = sl * ts_number_layers + tl;
-                aom_video_writer_write_frame(outfile[j], pkt->data.frame.buf,
-                                             pkt->data.frame.sz, pts);
+                if (outfile[j] != 0) {
+                  fwrite(pkt->data.frame.buf,
+                         1,pkt->data.frame.sz, outfile[j]);
+                }
                 if (sl == (unsigned int)layer_id.spatial_layer_id)
                   rc.layer_encoding_bitrate[j] += 8.0 * pkt->data.frame.sz;
                 // Keep count of rate control stats per layer (for non-key).
@@ -898,7 +901,7 @@ int main(int argc, char **argv) {
 
   // Try to rewrite the output file headers with the actual frame count.
   for (i = 0; i < ss_number_layers * ts_number_layers; ++i)
-    aom_video_writer_close(outfile[i]);
+    fclose(outfile[i]);
 
   if (input_ctx.file_type != FILE_TYPE_Y4M) {
     aom_img_free(&raw);
