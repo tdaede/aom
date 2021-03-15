@@ -687,6 +687,9 @@ int main(int argc, char **argv) {
   cfg.rc_buf_optimal_sz = 600;
   cfg.rc_buf_sz = 1000;
 
+  cfg.g_limit = 1;
+  cfg.full_still_picture_hdr = 1; // work around bug in MP4Box
+
   // Use 1 thread as default.
   cfg.g_threads = (unsigned int)strtoul(argv[11], NULL, 0);
 
