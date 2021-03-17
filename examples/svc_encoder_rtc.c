@@ -658,7 +658,9 @@ int main(int argc, char **argv) {
   for (i = min_args_base;
        (int)i < min_args_base + mode_to_num_layers[layering_mode]; ++i) {
     rc.layer_target_bitrate[i - 13] = (int)strtol(argv[i], NULL, 0);
-    svc_params.layer_target_bitrate[i - 13] = rc.layer_target_bitrate[i - 13];
+    svc_params.layer_target_bitrate[i - 13] = 0;
+    svc_params.max_quantizers[i - 13] = rc.layer_target_bitrate[i - 13];
+    svc_params.min_quantizers[i - 13] = rc.layer_target_bitrate[i - 13];
   }
 
   cfg.rc_target_bitrate =
@@ -678,16 +680,16 @@ int main(int argc, char **argv) {
   cfg.g_usage = AOM_USAGE_REALTIME;
 
   cfg.rc_dropframe_thresh = (unsigned int)strtoul(argv[9], NULL, 0);
-  cfg.rc_end_usage = AOM_CBR;
+  cfg.rc_end_usage = AOM_Q;
   cfg.rc_min_quantizer = 2;
-  cfg.rc_max_quantizer = 52;
+  cfg.rc_max_quantizer = 63;
   cfg.rc_undershoot_pct = 50;
   cfg.rc_overshoot_pct = 50;
-  cfg.rc_buf_initial_sz = 600;
-  cfg.rc_buf_optimal_sz = 600;
-  cfg.rc_buf_sz = 1000;
+  //cfg.rc_buf_initial_sz = 600;
+  //cfg.rc_buf_optimal_sz = 600;
+  //cfg.rc_buf_sz = 1000;
 
-  cfg.g_limit = 1;
+ // cfg.g_limit = 1;
   cfg.full_still_picture_hdr = 1; // work around bug in MP4Box
 
   // Use 1 thread as default.
@@ -753,10 +755,10 @@ int main(int argc, char **argv) {
 
   svc_params.number_spatial_layers = ss_number_layers;
   svc_params.number_temporal_layers = ts_number_layers;
-  for (i = 0; i < ss_number_layers * ts_number_layers; ++i) {
-    svc_params.max_quantizers[i] = cfg.rc_max_quantizer;
-    svc_params.min_quantizers[i] = cfg.rc_min_quantizer;
-  }
+  ///for (i = 0; i < ss_number_layers * ts_number_layers; ++i) {
+   // svc_params.max_quantizers[i] = cfg.rc_max_quantizer;
+    //svc_params.min_quantizers[i] = cfg.rc_min_quantizer;
+  //}
   for (i = 0; i < ss_number_layers; ++i) {
     svc_params.scaling_factor_num[i] = 1;
     svc_params.scaling_factor_den[i] = 1;
@@ -765,10 +767,13 @@ int main(int argc, char **argv) {
     svc_params.scaling_factor_num[0] = 1;
     svc_params.scaling_factor_den[0] = 2;
   } else if (ss_number_layers == 3) {
+    printf("3 layers\n");
     svc_params.scaling_factor_num[0] = 1;
-    svc_params.scaling_factor_den[0] = 4;
+    svc_params.scaling_factor_den[0] = 1;
     svc_params.scaling_factor_num[1] = 1;
-    svc_params.scaling_factor_den[1] = 2;
+    svc_params.scaling_factor_den[1] = 1;
+    svc_params.scaling_factor_num[2] = 1;
+    svc_params.scaling_factor_den[2] = 1;
   }
 
   aom_codec_control(&codec, AV1E_SET_SVC_PARAMS, &svc_params);
