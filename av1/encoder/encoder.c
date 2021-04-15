@@ -1389,7 +1389,10 @@ static void init_seq_coding_tools(SequenceHeader *seq, AV1_COMMON *cm,
         seq->operating_point_idc[i] =
             (~(~0u << (cm->number_spatial_layers - sl)) << 8) |
             ~(~0u << (cm->number_temporal_layers - tl));
+        printf("sl = %i, tl = %i, seq->operating_point_idc[%i] = %i\n", sl, tl, i, seq->operating_point_idc[i]);
         i++;
+        seq->operating_points_cnt_minus_1 = 0;
+        return;
       }
     }
   }
