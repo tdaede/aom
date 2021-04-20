@@ -769,9 +769,9 @@ int main(int argc, char **argv) {
   } else if (ss_number_layers == 3) {
     printf("3 layers\n");
     svc_params.scaling_factor_num[0] = 1;
-    svc_params.scaling_factor_den[0] = 1;
+    svc_params.scaling_factor_den[0] = 4;
     svc_params.scaling_factor_num[1] = 1;
-    svc_params.scaling_factor_den[1] = 1;
+    svc_params.scaling_factor_den[1] = 2;
     svc_params.scaling_factor_num[2] = 1;
     svc_params.scaling_factor_den[2] = 1;
   }
