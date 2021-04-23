@@ -752,6 +752,7 @@ int main(int argc, char **argv) {
   aom_codec_control(&codec, AV1E_SET_ENABLE_ORDER_HINT, 0);
   aom_codec_control(&codec, AV1E_SET_ENABLE_TPL_MODEL, 0);
   aom_codec_control(&codec, AV1E_SET_DELTAQ_MODE, 0);
+  aom_codec_control(&codec, AV1E_SET_FILM_GRAIN_TEST_VECTOR, 0);
 
   svc_params.number_spatial_layers = ss_number_layers;
   svc_params.number_temporal_layers = ts_number_layers;
@@ -765,7 +766,11 @@ int main(int argc, char **argv) {
   }
   if (ss_number_layers == 2) {
     svc_params.scaling_factor_num[0] = 1;
-    svc_params.scaling_factor_den[0] = 2;
+    svc_params.scaling_factor_den[0] = 1;
+    svc_params.scaling_factor_num[1] = 1;
+    svc_params.scaling_factor_den[1] = 1;
+    svc_params.scaling_factor_num[2] = 1;
+    svc_params.scaling_factor_den[2] = 1;
   } else if (ss_number_layers == 3) {
     printf("3 layers\n");
     svc_params.scaling_factor_num[0] = 1;
@@ -797,7 +802,11 @@ int main(int argc, char **argv) {
       aom_codec_iter_t iter = NULL;
       const aom_codec_cx_pkt_t *pkt;
       int layer = 0;
-
+      if (slx > 0) {
+        aom_codec_control(&codec, AV1E_SET_FILM_GRAIN_TEST_VECTOR, 2);
+      } else {
+        aom_codec_control(&codec, AV1E_SET_FILM_GRAIN_TEST_VECTOR, 0);
+      }
       // Set the reference/update flags, layer_id, and reference_map
       // buffer index.
       flags = set_layer_pattern(layering_mode, frame_cnt, &layer_id,

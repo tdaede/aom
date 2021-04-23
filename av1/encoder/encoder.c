@@ -800,6 +800,7 @@ static void update_film_grain_parameters(struct AV1_COMP *cpi,
 #endif
     memset(&cm->film_grain_params, 0, sizeof(cm->film_grain_params));
   }
+  cm->seq_params.film_grain_params_present = 1;
 }
 
 static void dealloc_compressor_data(AV1_COMP *cpi) {
